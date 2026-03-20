@@ -1,0 +1,895 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Exercise 1: The Prompt Lab — AI Literacy | Penn LPS</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #f5f6f8;
+      --surface: #ffffff;
+      --surface-2: #f0f2f6;
+      --border: #e3e6ec;
+      --border-strong: #c8cdd8;
+      --text: #111827;
+      --text-mid: #374151;
+      --text-muted: #6b7280;
+      --text-faint: #9ca3af;
+      --penn-blue: #011F5B;
+      --penn-blue-mid: #0d2e7a;
+      --penn-blue-tint: #edf0f8;
+      --penn-red: #990000;
+      --penn-red-tint: #fef5f5;
+      --green: #15803d;
+      --green-tint: #f0fdf4;
+      --amber: #92400e;
+      --amber-tint: #fffbeb;
+      --indigo: #4338ca;
+      --indigo-tint: #f5f3ff;
+      --sans: 'Inter', system-ui, -apple-system, sans-serif;
+      --mono: 'IBM Plex Mono', 'Courier New', monospace;
+      --radius: 8px;
+      --radius-lg: 14px;
+      --shadow: 0 1px 3px rgba(0,0,0,.06), 0 1px 2px rgba(0,0,0,.07);
+      --shadow-md: 0 4px 8px rgba(0,0,0,.06), 0 2px 4px rgba(0,0,0,.07);
+    }
+
+    html { scroll-behavior: smooth; font-size: 15px; }
+    body { font-family: var(--sans); color: var(--text); background: var(--bg); line-height: 1.65; }
+
+    /* ── TOPBAR ── */
+    .topbar {
+      position: sticky; top: 0; z-index: 200;
+      background: var(--penn-blue); color: #fff;
+      height: 52px; padding: 0 28px;
+      display: flex; align-items: center; gap: 16px;
+      box-shadow: 0 2px 8px rgba(0,0,0,.22);
+    }
+    .topbar-brand { font-size: .78rem; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: rgba(255,255,255,.65); white-space: nowrap; }
+    .topbar-sep { color: rgba(255,255,255,.25); }
+    .topbar-nav { display: flex; gap: 4px; }
+    .tnav { padding: 4px 12px; border-radius: 4px; font-size: .8rem; font-weight: 500; color: rgba(255,255,255,.55); text-decoration: none; transition: background .15s, color .15s; }
+    .tnav:hover { background: rgba(255,255,255,.1); color: #fff; }
+    .tnav.active { background: var(--penn-red); color: #fff; }
+    .topbar-spacer { flex: 1; }
+    .progress-track { display: flex; gap: 6px; align-items: center; }
+    .pdot { width: 9px; height: 9px; border-radius: 50%; background: rgba(255,255,255,.2); border: none; cursor: pointer; padding: 0; transition: background .2s, transform .2s; }
+    .pdot.active { background: rgba(255,255,255,.65); }
+    .pdot.done { background: #4ade80; transform: scale(1.15); }
+
+    /* ── HERO ── */
+    .hero {
+      background: linear-gradient(140deg, var(--penn-blue) 0%, #0d2e7a 55%, #1a4a9e 100%);
+      color: #fff; padding: 52px 40px 44px;
+      position: relative; overflow: hidden;
+    }
+    .hero::after {
+      content: ''; position: absolute; bottom: -80px; right: -60px;
+      width: 340px; height: 340px; border-radius: 50%;
+      background: radial-gradient(circle, rgba(255,255,255,.04) 0%, transparent 70%);
+    }
+    .hero-inner { max-width: 840px; margin: 0 auto; display: flex; gap: 48px; align-items: flex-start; position: relative; z-index: 1; }
+    .hero-left { flex: 1.1; }
+    .hero-eyebrow { font-size: .72rem; font-weight: 600; letter-spacing: .12em; text-transform: uppercase; color: rgba(255,255,255,.5); margin-bottom: 10px; }
+    .hero h1 { font-size: 2.3rem; font-weight: 700; line-height: 1.15; margin-bottom: 8px; letter-spacing: -.02em; }
+    .hero-sub { font-size: 1.05rem; color: rgba(255,255,255,.75); margin-bottom: 22px; max-width: 380px; line-height: 1.5; }
+    .hero-tags { display: flex; flex-wrap: wrap; gap: 8px; }
+    .hero-tag { background: rgba(255,255,255,.1); border: 1px solid rgba(255,255,255,.15); border-radius: 20px; padding: 4px 13px; font-size: .8rem; color: rgba(255,255,255,.8); }
+    .hero-right { flex: 1; min-width: 240px; }
+    .obj-box { background: rgba(255,255,255,.07); border: 1px solid rgba(255,255,255,.12); border-radius: var(--radius-lg); padding: 20px 22px; }
+    .obj-label { font-size: .68rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: rgba(255,255,255,.4); margin-bottom: 12px; }
+    .obj-list { list-style: none; counter-reset: obj; }
+    .obj-list li { counter-increment: obj; font-size: .875rem; color: rgba(255,255,255,.82); line-height: 1.5; padding: 6px 0 6px 28px; position: relative; border-bottom: 1px solid rgba(255,255,255,.07); }
+    .obj-list li:last-child { border-bottom: none; }
+    .obj-list li::before { content: counter(obj); position: absolute; left: 0; top: 8px; font-size: .68rem; font-weight: 700; color: var(--penn-red); background: rgba(153,0,0,.2); width: 18px; height: 18px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-family: var(--mono); }
+
+    /* ── MAIN ── */
+    .main { max-width: 840px; margin: 0 auto; padding: 36px 24px 80px; }
+
+    /* ── HOW TO USE ── */
+    .howto { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 24px 26px; margin-bottom: 32px; box-shadow: var(--shadow); }
+    .howto h2 { font-size: 1rem; font-weight: 700; margin-bottom: 16px; color: var(--penn-blue); }
+    .howto-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 14px; }
+    .howto-item { display: flex; gap: 10px; font-size: .85rem; line-height: 1.55; color: var(--text-mid); }
+    .howto-icon { font-size: 1.1rem; flex-shrink: 0; margin-top: 1px; }
+    .howto-tool { font-size: .83rem; color: var(--text-muted); background: var(--bg); border-radius: 6px; padding: 10px 14px; border: 1px solid var(--border); }
+
+    /* ── SECTIONS ── */
+    .content-section { margin-bottom: 36px; }
+    .task-header { display: flex; align-items: center; gap: 14px; margin-bottom: 16px; }
+    .task-num { width: 42px; height: 42px; border-radius: 50%; background: var(--penn-blue); color: #fff; font-size: 1.15rem; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-family: var(--mono); }
+    .task-title-wrap { flex: 1; }
+    .task-title { font-size: 1.25rem; font-weight: 700; color: var(--text); margin-bottom: 1px; }
+    .task-time { font-size: .73rem; color: var(--text-faint); font-family: var(--mono); }
+    .section-title { font-size: 1.05rem; font-weight: 700; color: var(--penn-blue); margin-bottom: 12px; padding-bottom: 8px; border-bottom: 2px solid var(--penn-blue-tint); }
+
+    /* ── PROSE CARD ── */
+    .prose-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 22px 24px; box-shadow: var(--shadow); }
+    .prose-card p { font-size: .92rem; color: var(--text-mid); margin-bottom: 12px; line-height: 1.72; }
+    .prose-card p:last-child { margin-bottom: 0; }
+    .prose-card strong { color: var(--text); }
+
+    /* ── BOXES ── */
+    .box { border-radius: var(--radius); padding: 16px 18px; margin-bottom: 14px; border-left: 4px solid; }
+    .box p, .box li { font-size: .88rem; line-height: 1.6; color: var(--text-mid); }
+    .box ul, .box ol { padding-left: 18px; margin-top: 6px; }
+    .box ul li, .box ol li { margin-bottom: 4px; }
+    .box-read { border-color: var(--text-faint); background: var(--surface-2); }
+    .box-action { border-color: var(--penn-blue); background: var(--penn-blue-tint); }
+    .box-action .box-type-label { color: var(--penn-blue); }
+    .box-reflect { border-color: var(--penn-red); background: var(--penn-red-tint); }
+    .box-reflect .box-type-label { color: var(--penn-red); }
+    .box-evidence { border-color: var(--indigo); background: var(--indigo-tint); }
+    .box-evidence .box-type-label { color: var(--indigo); }
+    .box-submit { border-color: var(--green); background: var(--green-tint); }
+    .box-submit .box-type-label { color: var(--green); }
+    .box-type-label { font-size: .67rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; margin-bottom: 6px; opacity: .75; }
+
+    /* ── PROMPT TERMINAL ── */
+    .prompt-terminal { background: #1e2533; border-radius: var(--radius); overflow: hidden; margin-bottom: 14px; }
+    .terminal-bar { background: #141921; padding: 10px 16px; display: flex; align-items: center; gap: 8px; }
+    .dots { display: flex; gap: 5px; }
+    .dot { width: 10px; height: 10px; border-radius: 50%; }
+    .dot.red { background: #ff5f57; }
+    .dot.yellow { background: #febc2e; }
+    .dot.green { background: #28c840; }
+    .terminal-label { font-family: var(--mono); font-size: .7rem; color: rgba(255,255,255,.3); margin-left: 6px; }
+    .copy-btn { margin-left: auto; background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.12); border-radius: 4px; color: rgba(255,255,255,.6); font-family: var(--mono); font-size: .72rem; padding: 4px 10px; cursor: pointer; transition: background .15s; }
+    .copy-btn:hover { background: rgba(255,255,255,.15); }
+    .copy-btn.copied { background: rgba(74,222,128,.15); color: #4ade80; border-color: rgba(74,222,128,.25); }
+    .prompt-body { padding: 18px 20px; font-family: var(--mono); font-size: .84rem; color: #e2e8f0; line-height: 1.8; }
+    .prompt-body code { display: block; white-space: pre-wrap; }
+    .ph { color: #fbbf24; font-style: italic; }
+    .comment-line { color: #4b5775; }
+
+    /* ── RESPONSE AREAS ── */
+    .response-area { margin-bottom: 16px; }
+    .response-area label { display: block; font-size: .82rem; font-weight: 600; color: var(--text-muted); margin-bottom: 5px; }
+    textarea { width: 100%; padding: 11px 13px; font-family: var(--sans); font-size: .88rem; line-height: 1.65; color: var(--text); background: var(--surface); border: 1.5px solid var(--border); border-radius: var(--radius); resize: vertical; transition: border-color .15s, box-shadow .15s; }
+    textarea:focus { outline: none; border-color: var(--penn-blue); box-shadow: 0 0 0 3px rgba(1,31,91,.09); }
+
+    /* ── REFLECTION QUESTIONS ── */
+    .reflect-q { background: var(--surface); border: 1px solid #fde68a; border-left: 4px solid var(--penn-red); border-radius: var(--radius); padding: 18px 20px; margin-bottom: 16px; }
+    .q-num { font-family: var(--mono); font-size: .68rem; color: var(--penn-red); font-weight: 700; letter-spacing: .08em; text-transform: uppercase; margin-bottom: 7px; }
+    .q-text { font-size: .95rem; font-weight: 600; color: var(--text); margin-bottom: 6px; line-height: 1.45; }
+    .q-hint { font-size: .82rem; color: var(--text-muted); font-style: italic; margin-bottom: 10px; line-height: 1.5; }
+
+    /* ── ISSUE GRID ── */
+    .issue-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(175px, 1fr)); gap: 10px; margin: 14px 0; }
+    .issue-card { border: 1.5px solid var(--border); border-radius: var(--radius); padding: 14px; cursor: pointer; background: var(--surface); transition: border-color .15s, box-shadow .15s, background .15s; user-select: none; }
+    .issue-card:hover { border-color: var(--penn-blue); background: var(--penn-blue-tint); }
+    .issue-card.selected { border-color: var(--penn-blue); background: var(--penn-blue-tint); box-shadow: 0 0 0 3px rgba(1,31,91,.12); }
+    .issue-emoji { font-size: 1.5rem; margin-bottom: 6px; }
+    .issue-name { font-size: .85rem; font-weight: 600; color: var(--text); }
+    .issue-desc { font-size: .76rem; color: var(--text-muted); margin-top: 3px; line-height: 1.4; }
+    .selection-confirm { background: var(--green-tint); border: 1px solid #86efac; border-radius: var(--radius); padding: 10px 14px; font-size: .85rem; color: var(--green); margin-top: 8px; display: none; }
+    .custom-row { display: flex; gap: 8px; margin-top: 10px; align-items: center; }
+    .custom-row input { flex: 1; padding: 8px 12px; border: 1.5px solid var(--border); border-radius: var(--radius); font-size: .88rem; font-family: var(--sans); color: var(--text); }
+    .custom-row input:focus { outline: none; border-color: var(--penn-blue); }
+    .btn-sm { padding: 8px 16px; background: var(--penn-blue); color: #fff; border: none; border-radius: var(--radius); font-size: .82rem; font-weight: 600; cursor: pointer; white-space: nowrap; }
+    .btn-sm:hover { background: var(--penn-blue-mid); }
+
+    /* ── SUBMIT PANEL ── */
+    .submit-panel { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 28px 32px; box-shadow: var(--shadow-md); margin-top: 8px; }
+    .submit-panel h2 { font-size: 1.1rem; font-weight: 700; margin-bottom: 8px; color: var(--penn-blue); }
+    .submit-panel > p { font-size: .88rem; color: var(--text-muted); margin-bottom: 20px; line-height: 1.6; }
+    .checklist { list-style: none; margin-bottom: 24px; }
+    .checklist li { display: flex; align-items: flex-start; gap: 10px; padding: 9px 0; border-bottom: 1px solid var(--border); font-size: .88rem; color: var(--text-mid); }
+    .checklist li:last-child { border-bottom: none; }
+    .checklist input[type="checkbox"] { width: 17px; height: 17px; flex-shrink: 0; margin-top: 2px; accent-color: var(--penn-blue); cursor: pointer; }
+    .check-note { font-size: .78rem; color: var(--text-faint); display: block; margin-top: 2px; }
+    .btn-submit { padding: 13px 32px; background: var(--penn-blue); color: #fff; border: none; border-radius: var(--radius); font-size: .95rem; font-weight: 700; cursor: pointer; letter-spacing: .01em; transition: background .15s, transform .1s; display: block; width: 100%; }
+    .btn-submit:hover { background: var(--penn-blue-mid); }
+    .btn-submit:active { transform: scale(.99); }
+
+    /* ── DIVIDER ── */
+    .section-divider { border: none; border-top: 1px solid var(--border); margin: 28px 0; }
+
+    /* ── FOOTER ── */
+    footer { text-align: center; padding: 24px; font-size: .78rem; color: var(--text-faint); border-top: 1px solid var(--border); max-width: 840px; margin: 0 auto; }
+
+    /* ── MODAL ── */
+    .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,.5); z-index: 500; display: flex; align-items: center; justify-content: center; padding: 24px; }
+    .modal-overlay.hidden { display: none; }
+    .modal { background: var(--surface); border-radius: var(--radius-lg); width: 100%; max-width: 620px; max-height: 80vh; display: flex; flex-direction: column; box-shadow: 0 20px 40px rgba(0,0,0,.2); }
+    .modal-header { padding: 20px 24px 16px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
+    .modal-header h3 { font-size: 1rem; font-weight: 700; }
+    .modal-close { background: none; border: none; font-size: 1.2rem; cursor: pointer; color: var(--text-muted); padding: 4px 8px; border-radius: 4px; }
+    .modal-close:hover { background: var(--bg); }
+    .modal-body { padding: 20px 24px; overflow-y: auto; flex: 1; }
+    .modal-body p { font-size: .88rem; color: var(--text-muted); margin-bottom: 16px; line-height: 1.6; }
+    .modal-answer { margin-bottom: 18px; }
+    .modal-answer .label { font-size: .72rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--penn-red); margin-bottom: 4px; }
+    .modal-answer .value { font-size: .88rem; color: var(--text); background: var(--bg); padding: 10px 12px; border-radius: 6px; line-height: 1.6; white-space: pre-wrap; }
+    .modal-footer { padding: 16px 24px; border-top: 1px solid var(--border); display: flex; gap: 10px; }
+    .btn-print { flex: 1; padding: 10px; background: var(--penn-blue); color: #fff; border: none; border-radius: var(--radius); font-size: .88rem; font-weight: 600; cursor: pointer; }
+    .btn-print:hover { background: var(--penn-blue-mid); }
+    .btn-cancel { padding: 10px 18px; background: var(--bg); color: var(--text-muted); border: 1px solid var(--border); border-radius: var(--radius); font-size: .88rem; cursor: pointer; }
+
+    /* ── PRINT ── */
+    @media print {
+      .topbar, .howto, .hero-tags, .copy-btn, .issue-grid, .custom-row, .prompt-terminal, .box-evidence, .btn-submit, .modal-footer, .checklist input { display: none; }
+      body { background: #fff; font-size: 12pt; }
+      .main { padding: 0; max-width: 100%; }
+      .prose-card, .reflect-q, .box { box-shadow: none; }
+    }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 700px) {
+      .hero { padding: 32px 20px 28px; }
+      .hero-inner { flex-direction: column; gap: 24px; }
+      .hero h1 { font-size: 1.8rem; }
+      .hero-right { display: none; }
+      .main { padding: 24px 16px 60px; }
+      .howto-grid { grid-template-columns: 1fr; }
+      .issue-grid { grid-template-columns: 1fr 1fr; }
+      .topbar-nav { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ── TOPBAR ── -->
+<nav class="topbar" aria-label="Course navigation">
+  <span style="display:flex;align-items:center;gap:9px;">
+    <span style="width:28px;height:28px;border-radius:50%;border:1.5px solid rgba(255,255,255,.35);display:flex;align-items:center;justify-content:center;font-size:.75rem;font-weight:700;color:#fff;font-family:var(--mono);flex-shrink:0;">P</span>
+    <span style="display:flex;flex-direction:column;line-height:1.25;">
+      <span style="font-size:.72rem;font-weight:700;letter-spacing:.07em;color:#fff;text-transform:uppercase;">Penn LPS</span>
+      <span style="font-size:.6rem;letter-spacing:.1em;color:rgba(255,255,255,.5);text-transform:uppercase;">Online</span>
+    </span>
+  </span>
+  <div class="topbar-nav">
+    <span class="tnav active">Ex 1</span>
+    <a href="../hallucination-hunt/" class="tnav">Ex 2</a>
+    <a href="../framing-audit/" class="tnav">Ex 3</a>
+    <a href="../ai-research-partner/" class="tnav">Ex 4</a>
+  </div>
+  <div class="topbar-spacer"></div>
+  <div class="progress-track" id="progressTrack" aria-label="Exercise progress"></div>
+</nav>
+
+<!-- ── HERO ── -->
+<section class="hero" aria-label="Exercise overview">
+  <div class="hero-inner">
+    <div class="hero-left">
+      <p class="hero-eyebrow">Exercise 1 &middot; Prompt Engineering</p>
+      <h1>The Prompt Lab</h1>
+      <p class="hero-sub">How the words you choose shape the answers you get</p>
+      <div class="hero-tags">
+        <span class="hero-tag">⏱ ~60 minutes</span>
+        <span class="hero-tag">🔬 Hands-on</span>
+        <span class="hero-tag">📸 Screenshots required</span>
+        <span class="hero-tag">✍️ Typed reflections</span>
+        <span class="hero-tag">🛠️ Any AI tool</span>
+      </div>
+    </div>
+    <div class="hero-right">
+      <div class="obj-box">
+        <p class="obj-label">Learning Objectives</p>
+        <ol class="obj-list">
+          <li>Understand how prompt structure shapes AI output quality</li>
+          <li>Improve a prompt through at least four iterations</li>
+          <li>Compare AI responses and explain what changed — and why</li>
+          <li>Connect prompt engineering skills to your own professional context</li>
+        </ol>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── MAIN ── -->
+<main class="main">
+
+  <!-- HOW TO USE -->
+  <div class="howto">
+    <h2>How to Use This Exercise</h2>
+    <div class="howto-grid">
+      <div class="howto-item">
+        <span class="howto-icon">🔵</span>
+        <div><strong>Blue boxes</strong> are action items — read the instructions and complete the task before moving on.</div>
+      </div>
+      <div class="howto-item">
+        <span class="howto-icon">🖥️</span>
+        <div><strong>Dark terminal boxes</strong> show prompt templates. Copy the text, fill in the placeholders (shown in <span style="color:#d97706;font-family:var(--mono);font-size:.9em;">yellow</span>), and paste into your AI tool.</div>
+      </div>
+      <div class="howto-item">
+        <span class="howto-icon">🟡</span>
+        <div><strong>Yellow boxes</strong> are reflection questions. Type your answers directly in this page — you'll compile them into a submission document at the end.</div>
+      </div>
+      <div class="howto-item">
+        <span class="howto-icon">🟣</span>
+        <div><strong>Purple boxes</strong> tell you what screenshots or other evidence to collect for your Canvas submission.</div>
+      </div>
+    </div>
+    <p class="howto-tool">You can use any AI assistant: <strong>ChatGPT, Claude, Gemini, Microsoft Copilot</strong>, or any other. Pick one and use it for the <em>entire exercise</em> so your comparisons are consistent.</p>
+  </div>
+
+  <!-- BACKGROUND -->
+  <section data-section="background" class="content-section">
+    <h2 class="section-title">Background</h2>
+    <div class="prose-card">
+      <p>When you type a message to an AI assistant, that message is called a <strong>prompt</strong>. The same underlying model can produce wildly different results depending on how you phrase your request — because the prompt is essentially everything the AI has to work with.</p>
+      <p>Think of it like giving directions. "Go somewhere nice for dinner" and "Find an Italian restaurant within a 10-minute walk that's open on Sunday and has outdoor seating" will lead you to very different places. AI tools work the same way: vague input produces generic output; specific, contextualized input produces something actually useful.</p>
+      <p>This skill — deliberately crafting your input to get better outputs — is called <strong>prompt engineering</strong>. Despite the technical-sounding name, it's fundamentally a communication skill. You don't need to know how AI works under the hood to do it well. You just need to practice thinking carefully about what you actually want and how to communicate that clearly.</p>
+      <p>In this exercise, you'll take a deliberately bad starting prompt and improve it through four rounds of revision, comparing the results as you go. By the end, you'll have developed your own intuitions about what makes a prompt work.</p>
+    </div>
+  </section>
+
+  <hr class="section-divider">
+
+  <!-- TASK 0: CHOOSE YOUR ISSUE -->
+  <section data-section="task0" class="content-section">
+    <div class="task-header">
+      <div class="task-num" style="background: #4b5563; font-size:.9rem;">0</div>
+      <div class="task-title-wrap">
+        <h2 class="task-title">Choose Your Issue</h2>
+        <span class="task-time">~5 min &mdash; do this first</span>
+      </div>
+    </div>
+
+    <div class="box box-action">
+      <p class="box-type-label">Action</p>
+      <p>Select a public issue or professional topic you'll work with throughout this exercise. You'll use the same issue for all four tasks, so choose something you find genuinely interesting — ideally something connected to your field, background, or career goals.</p>
+      <p style="margin-top:8px;">Once you select an issue, it will automatically fill into the prompt templates below.</p>
+    </div>
+
+    <div class="issue-grid" id="issueGrid">
+      <div class="issue-card" onclick="selectIssue(this, 'affordable housing')">
+        <div class="issue-emoji">🏘️</div>
+        <div class="issue-name">Affordable Housing</div>
+        <div class="issue-desc">Causes, policies, and community responses</div>
+      </div>
+      <div class="issue-card" onclick="selectIssue(this, 'criminal justice reform')">
+        <div class="issue-emoji">⚖️</div>
+        <div class="issue-name">Criminal Justice</div>
+        <div class="issue-desc">Reform efforts and systemic challenges</div>
+      </div>
+      <div class="issue-card" onclick="selectIssue(this, 'climate adaptation')">
+        <div class="issue-emoji">🌡️</div>
+        <div class="issue-name">Climate Adaptation</div>
+        <div class="issue-desc">Preparing communities for climate change</div>
+      </div>
+      <div class="issue-card" onclick="selectIssue(this, 'public health infrastructure')">
+        <div class="issue-emoji">💊</div>
+        <div class="issue-name">Public Health</div>
+        <div class="issue-desc">Access, prevention, and systems</div>
+      </div>
+      <div class="issue-card" onclick="selectIssue(this, 'K–12 education equity')">
+        <div class="issue-emoji">🎓</div>
+        <div class="issue-name">Education Equity</div>
+        <div class="issue-desc">Funding gaps and opportunity disparities</div>
+      </div>
+      <div class="issue-card" onclick="selectIssue(this, 'workforce development')">
+        <div class="issue-emoji">💼</div>
+        <div class="issue-name">Workforce Development</div>
+        <div class="issue-desc">Job training, reentry, and mobility</div>
+      </div>
+      <div class="issue-card" onclick="selectIssue(this, 'public transportation access')">
+        <div class="issue-emoji">🚌</div>
+        <div class="issue-name">Transportation Access</div>
+        <div class="issue-desc">Transit equity and infrastructure</div>
+      </div>
+      <div class="issue-card" onclick="selectIssue(this, 'immigration policy')">
+        <div class="issue-emoji">🌐</div>
+        <div class="issue-name">Immigration Policy</div>
+        <div class="issue-desc">Policy debates and community impacts</div>
+      </div>
+      <div class="issue-card" onclick="showCustomInput(this)">
+        <div class="issue-emoji">✏️</div>
+        <div class="issue-name">My Own Topic</div>
+        <div class="issue-desc">Enter a topic from your own field</div>
+      </div>
+    </div>
+
+    <div class="custom-row" id="customRow" style="display:none;">
+      <input type="text" id="customInput" placeholder="e.g., veterans' mental health services" maxlength="60">
+      <button class="btn-sm" onclick="confirmCustom()">Use this →</button>
+    </div>
+
+    <div class="selection-confirm" id="selectionConfirm">
+      ✓ Your issue: <strong id="selectedIssueName"></strong>. The prompt templates below will reflect your choice.
+    </div>
+  </section>
+
+  <hr class="section-divider">
+
+  <!-- TASK 1: THE BASELINE -->
+  <section data-section="task1" class="content-section">
+    <div class="task-header">
+      <div class="task-num">1</div>
+      <div class="task-title-wrap">
+        <h2 class="task-title">The Baseline</h2>
+        <span class="task-time">~10 min</span>
+      </div>
+    </div>
+
+    <div class="box box-action">
+      <p class="box-type-label">Action</p>
+      <p>Run the prompt below <em>exactly as written</em> — don't add anything to it. We're establishing a baseline so you have something concrete to compare against in later tasks. After it runs, take a screenshot and answer the questions below.</p>
+    </div>
+
+    <div class="prompt-terminal">
+      <div class="terminal-bar">
+        <div class="dots"><span class="dot red"></span><span class="dot yellow"></span><span class="dot green"></span></div>
+        <span class="terminal-label">Prompt — Version 1 of 4</span>
+        <button class="copy-btn" onclick="copyPrompt(this)">⎘ Copy</button>
+      </div>
+      <div class="prompt-body">
+        <code>Tell me about <span class="ph" data-ph="issue">[YOUR ISSUE]</span>.</code>
+      </div>
+    </div>
+
+    <div class="response-area">
+      <label>What did you get? Describe the output in 2–3 sentences. What kind of information did the AI provide? How long was it?</label>
+      <textarea data-label="Task 1 — Describe the output" rows="4" placeholder="e.g., The AI gave me a broad, textbook-style overview of about 300 words. It covered general definitions and mentioned some statistics, but didn't go into specific policies or recent developments…"></textarea>
+    </div>
+
+    <div class="response-area">
+      <label>What was missing, vague, or not useful? List at least three specific things the AI left out or should have done differently.</label>
+      <textarea data-label="Task 1 — What was missing" rows="5" placeholder="1. It didn't say who the audience was for, so the level of detail felt off&#10;2. No mention of recent policy changes or local context&#10;3. …"></textarea>
+    </div>
+
+    <div class="box box-evidence">
+      <p class="box-type-label">📸 Evidence to Collect</p>
+      <p>Take a screenshot of this full conversation (include the prompt at the top and the complete AI response). Save it as <strong>"Task 1 — Baseline"</strong>. You'll attach it to your Canvas submission.</p>
+    </div>
+  </section>
+
+  <hr class="section-divider">
+
+  <!-- TASK 2: ROLE & AUDIENCE -->
+  <section data-section="task2" class="content-section">
+    <div class="task-header">
+      <div class="task-num">2</div>
+      <div class="task-title-wrap">
+        <h2 class="task-title">Add Role &amp; Audience</h2>
+        <span class="task-time">~10 min</span>
+      </div>
+    </div>
+
+    <div class="box box-read">
+      <p class="box-type-label">Why This Works</p>
+      <p>AI tools respond to context. When you tell the model <em>who you are</em>, <em>who will read the output</em>, and <em>what the purpose is</em>, it can calibrate vocabulary, depth, and emphasis accordingly. A briefing for a city council member looks different from a memo for a technical team — the AI can adjust, but only if you tell it to.</p>
+    </div>
+
+    <div class="box box-action">
+      <p class="box-type-label">Action</p>
+      <p>Rewrite your prompt using the template below. Replace every placeholder (<span style="color:#d97706;font-family:var(--mono);font-size:.9em;">shown in yellow</span>) with your own information. Then run it in the same AI tool you used in Task 1.</p>
+    </div>
+
+    <div class="prompt-terminal">
+      <div class="terminal-bar">
+        <div class="dots"><span class="dot red"></span><span class="dot yellow"></span><span class="dot green"></span></div>
+        <span class="terminal-label">Prompt Template — Version 2 of 4</span>
+        <button class="copy-btn" onclick="copyPrompt(this)">⎘ Copy</button>
+      </div>
+      <div class="prompt-body">
+        <code>I am a <span class="ph">[YOUR ROLE — e.g., "graduate student", "nonprofit coordinator", "policy analyst"]</span> working on a project about <span class="ph" data-ph="issue">[YOUR ISSUE]</span>.
+
+I need a concise overview of this topic for <span class="ph">[YOUR AUDIENCE — e.g., "a general audience unfamiliar with the topic", "a city council member", "my classmates in a policy course"]</span>.
+
+My goal is to <span class="ph">[YOUR PURPOSE — e.g., "understand the main causes and current responses", "identify the two or three biggest policy debates in this area"]</span>.</code>
+      </div>
+    </div>
+
+    <div class="response-area">
+      <label>Paste the exact prompt you used (with all placeholders filled in):</label>
+      <textarea data-label="Task 2 — Your actual prompt" rows="7" placeholder="Paste your completed Version 2 prompt here…"></textarea>
+    </div>
+
+    <div class="response-area">
+      <label>How did the output change compared to Task 1? Be specific — note differences in tone, depth, structure, or content.</label>
+      <textarea data-label="Task 2 — What changed" rows="5" placeholder="e.g., The response was more focused this time — it addressed specific causes rather than just defining the issue. The tone was less textbook and more practical…"></textarea>
+    </div>
+
+    <div class="box box-evidence">
+      <p class="box-type-label">📸 Evidence to Collect</p>
+      <p>Screenshot this conversation. Save it as <strong>"Task 2 — Role &amp; Audience"</strong>.</p>
+    </div>
+  </section>
+
+  <hr class="section-divider">
+
+  <!-- TASK 3: STRUCTURE & CONSTRAINTS -->
+  <section data-section="task3" class="content-section">
+    <div class="task-header">
+      <div class="task-num">3</div>
+      <div class="task-title-wrap">
+        <h2 class="task-title">Add Structure &amp; Constraints</h2>
+        <span class="task-time">~10 min</span>
+      </div>
+    </div>
+
+    <div class="box box-read">
+      <p class="box-type-label">Why This Works</p>
+      <p>Specifying <em>format</em>, <em>length</em>, and <em>specific questions to answer</em> reduces the model's guesswork. Instead of deciding what counts as a "good answer," it follows your structure. This also makes the output easier to use — you get what you actually need, organized the way you need it.</p>
+    </div>
+
+    <div class="box box-action">
+      <p class="box-type-label">Action</p>
+      <p>Build on your Version 2 prompt by adding the structural elements shown below. You can copy your Version 2 prompt and add to it, or use this template as a starting point. Customize the three questions to match what you actually want to know about your issue.</p>
+    </div>
+
+    <div class="prompt-terminal">
+      <div class="terminal-bar">
+        <div class="dots"><span class="dot red"></span><span class="dot yellow"></span><span class="dot green"></span></div>
+        <span class="terminal-label">Prompt Template — Version 3 of 4</span>
+        <button class="copy-btn" onclick="copyPrompt(this)">⎘ Copy</button>
+      </div>
+      <div class="prompt-body">
+        <code><span class="comment-line">[Paste your Version 2 prompt here, then add the following:]</span>
+
+Please structure your response to answer these three questions:
+1. <span class="ph">[QUESTION 1 — e.g., "What are the root causes of this problem?"]</span>
+2. <span class="ph">[QUESTION 2 — e.g., "What policy solutions have been tried, and with what results?"]</span>
+3. <span class="ph">[QUESTION 3 — e.g., "What are the main points of disagreement among policymakers or experts?"]</span>
+
+Use clear headings for each section. Keep your total response under 400 words. Write for someone who is informed but not a specialist in this field — avoid jargon.</code>
+      </div>
+    </div>
+
+    <div class="response-area">
+      <label>Paste the exact prompt you used:</label>
+      <textarea data-label="Task 3 — Your actual prompt" rows="10" placeholder="Paste your completed Version 3 prompt here…"></textarea>
+    </div>
+
+    <div class="response-area">
+      <label>How did this output compare to Version 2? What did the added structure accomplish?</label>
+      <textarea data-label="Task 3 — What changed" rows="5" placeholder="e.g., The headings made it much easier to scan. The AI actually stayed under 400 words this time, which was impressive. The three questions kept it focused on what I needed…"></textarea>
+    </div>
+
+    <div class="box box-evidence">
+      <p class="box-type-label">📸 Evidence to Collect</p>
+      <p>Screenshot this conversation. Save it as <strong>"Task 3 — Structure &amp; Constraints"</strong>.</p>
+    </div>
+  </section>
+
+  <hr class="section-divider">
+
+  <!-- TASK 4: CONSTRAINTS & GUARDRAILS -->
+  <section data-section="task4" class="content-section">
+    <div class="task-header">
+      <div class="task-num">4</div>
+      <div class="task-title-wrap">
+        <h2 class="task-title">Add Guardrails</h2>
+        <span class="task-time">~10 min</span>
+      </div>
+    </div>
+
+    <div class="box box-read">
+      <p class="box-type-label">Why This Works</p>
+      <p>So far you've told the AI <em>what to do</em>. Now try telling it <em>what not to do</em>. Negative constraints — sometimes called guardrails — help prevent common failure modes: overconfident claims, unverifiable statistics, unsolicited opinions, or inappropriate framing. They're especially important in professional contexts where accuracy and neutrality matter.</p>
+    </div>
+
+    <div class="box box-action">
+      <p class="box-type-label">Action</p>
+      <p>Add the guardrails section below to your Version 3 prompt. Choose the constraints that make the most sense for your issue and your use case. You can customize the language or add your own constraints.</p>
+    </div>
+
+    <div class="prompt-terminal">
+      <div class="terminal-bar">
+        <div class="dots"><span class="dot red"></span><span class="dot yellow"></span><span class="dot green"></span></div>
+        <span class="terminal-label">Prompt Template — Version 4 of 4</span>
+        <button class="copy-btn" onclick="copyPrompt(this)">⎘ Copy</button>
+      </div>
+      <div class="prompt-body">
+        <code><span class="comment-line">[Paste your Version 3 prompt here, then add the following:]</span>
+
+Important constraints:
+- Do not cite specific statistics unless you are confident they are accurate. If data is relevant but uncertain, describe the general trend instead.
+- Do not make policy recommendations or express a political opinion.
+- If something is genuinely contested or debated, present it as such rather than stating one view as fact.
+- <span class="ph">[ADD YOUR OWN — e.g., "Do not use acronyms without first spelling them out" or "Focus only on the United States context"]</span></code>
+      </div>
+    </div>
+
+    <div class="response-area">
+      <label>Paste the exact prompt you used:</label>
+      <textarea data-label="Task 4 — Your actual prompt" rows="12" placeholder="Paste your completed Version 4 prompt here…"></textarea>
+    </div>
+
+    <div class="response-area">
+      <label>Did the guardrails change the output in noticeable ways? What did you observe?</label>
+      <textarea data-label="Task 4 — Guardrail observations" rows="5" placeholder="e.g., The AI stopped using phrases like 'studies show' without attributing them. It added 'this is a debated topic' in one place where it previously stated something as fact…"></textarea>
+    </div>
+
+    <div class="box box-evidence">
+      <p class="box-type-label">📸 Evidence to Collect</p>
+      <p>Screenshot this conversation. Save it as <strong>"Task 4 — Guardrails"</strong>. This is your final prompt — keep the text handy for the submission.</p>
+    </div>
+  </section>
+
+  <hr class="section-divider">
+
+  <!-- REFLECTION -->
+  <section data-section="reflection" class="content-section">
+    <div class="task-header">
+      <div class="task-num" style="background: var(--penn-red);">R</div>
+      <div class="task-title-wrap">
+        <h2 class="task-title">Reflection</h2>
+        <span class="task-time">~20 min &mdash; answer all five</span>
+      </div>
+    </div>
+
+    <div class="box box-reflect" style="margin-bottom:20px;">
+      <p class="box-type-label">Heads Up</p>
+      <p>These questions ask for <em>your</em> thinking — not a summary of what the AI did. Answers that simply describe the outputs without interpretation or personal connection will not demonstrate the learning this exercise is designed to develop. Aim for 3–5 sentences per question.</p>
+    </div>
+
+    <div class="reflect-q">
+      <p class="q-num">Reflection 1</p>
+      <p class="q-text">Looking across all four versions, which single change made the biggest difference in output quality? Why do you think that particular change had such a strong effect?</p>
+      <p class="q-hint">Think about what information you gave the AI that it didn't have before, and how the model would "use" that information differently.</p>
+      <textarea data-label="Reflection 1 — Biggest single change" rows="5" placeholder="Your response here…"></textarea>
+    </div>
+
+    <div class="reflect-q">
+      <p class="q-num">Reflection 2</p>
+      <p class="q-text">Was your Version 4 output actually usable — could you hand it to someone as-is? What would still need human editing, verification, or judgment before it could be used professionally?</p>
+      <p class="q-hint">Be honest and specific. What did the AI get right? What did it get wrong, miss, or oversimplify?</p>
+      <textarea data-label="Reflection 2 — Usability of final output" rows="5" placeholder="Your response here…"></textarea>
+    </div>
+
+    <div class="reflect-q">
+      <p class="q-num">Reflection 3</p>
+      <p class="q-text">Think about a task you do regularly — at work, in school, or in your personal life. How could a well-crafted prompt help you with it? Write a draft of that prompt in your answer.</p>
+      <p class="q-hint">This should be something real and specific to you, not a hypothetical. The goal is to connect what you practiced here to something you'll actually use.</p>
+      <textarea data-label="Reflection 3 — Personal application + draft prompt" rows="7" placeholder="Your response here, including a draft prompt…"></textarea>
+    </div>
+
+    <div class="reflect-q">
+      <p class="q-num">Reflection 4</p>
+      <p class="q-text">A classmate argues: "AI just does what you tell it — so a better prompt is just better instructions. There's nothing unique about working with AI compared to, say, writing a good Google search." How would you respond based on what you experienced today?</p>
+      <p class="q-hint">Where is your classmate right? Where do you think they're missing something? What makes prompting different from a search query?</p>
+      <textarea data-label="Reflection 4 — Prompting vs. searching" rows="5" placeholder="Your response here…"></textarea>
+    </div>
+
+    <div class="reflect-q">
+      <p class="q-num">Reflection 5</p>
+      <p class="q-text">In your view, what is the most important thing a professional (in any field) should understand about prompt engineering before using AI tools at work? Frame your answer as advice to a colleague who has never used AI before.</p>
+      <p class="q-hint">Draw from your experience in this exercise, but think beyond it. What's the principle you'd most want someone to internalize?</p>
+      <textarea data-label="Reflection 5 — Advice to a new user" rows="5" placeholder="Your response here…"></textarea>
+    </div>
+  </section>
+
+  <hr class="section-divider">
+
+  <!-- SUBMISSION PANEL -->
+  <section data-section="submission" class="content-section">
+    <div class="submit-panel">
+      <h2>Prepare Your Canvas Submission</h2>
+      <p>When you're done, click the button below to compile all your typed responses into a printable document. Save it as a PDF and upload it to Canvas along with your four screenshots.</p>
+
+      <ul class="checklist">
+        <li>
+          <input type="checkbox" id="chk1">
+          <label for="chk1">
+            📸 Screenshot: <strong>Task 1 — Baseline</strong> (full prompt + response visible)
+            <span class="check-note">Shows your starting point and what a vague prompt produces</span>
+          </label>
+        </li>
+        <li>
+          <input type="checkbox" id="chk2">
+          <label for="chk2">
+            📸 Screenshot: <strong>Task 2 — Role &amp; Audience</strong>
+            <span class="check-note">Shows the improvement from adding context</span>
+          </label>
+        </li>
+        <li>
+          <input type="checkbox" id="chk3">
+          <label for="chk3">
+            📸 Screenshot: <strong>Task 3 — Structure &amp; Constraints</strong>
+            <span class="check-note">Shows the improvement from adding format guidance</span>
+          </label>
+        </li>
+        <li>
+          <input type="checkbox" id="chk4">
+          <label for="chk4">
+            📸 Screenshot: <strong>Task 4 — Guardrails</strong> (your final prompt version)
+            <span class="check-note">Shows your most complete, polished prompt</span>
+          </label>
+        </li>
+        <li>
+          <input type="checkbox" id="chk5">
+          <label for="chk5">
+            📄 <strong>This document</strong>, compiled as a PDF (use the button below)
+            <span class="check-note">Contains your task observations and all five reflection responses</span>
+          </label>
+        </li>
+      </ul>
+
+      <button class="btn-submit" onclick="prepareSubmission()">Compile My Responses →</button>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  University of Pennsylvania &mdash; School of Liberal and Professional Studies &mdash; AI Literacy Course
+</footer>
+
+<!-- SUBMISSION MODAL -->
+<div class="modal-overlay hidden" id="submissionModal">
+  <div class="modal">
+    <div class="modal-header">
+      <h3>Exercise 1: The Prompt Lab — Your Responses</h3>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-body" id="modalBody">
+      <p>Review your responses below. When ready, click <strong>Print / Save as PDF</strong> and upload the PDF to Canvas along with your four screenshots.</p>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-cancel" onclick="closeModal()">Close</button>
+      <button class="btn-print" onclick="printSubmission()">🖨️ Print / Save as PDF</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  /* ── ISSUE SELECTION ── */
+  let selectedIssue = null;
+
+  function selectIssue(card, name) {
+    document.querySelectorAll('.issue-card').forEach(c => c.classList.remove('selected'));
+    card.classList.add('selected');
+    selectedIssue = name;
+    applyIssue(name);
+    document.getElementById('customRow').style.display = 'none';
+  }
+
+  function showCustomInput(card) {
+    document.querySelectorAll('.issue-card').forEach(c => c.classList.remove('selected'));
+    card.classList.add('selected');
+    document.getElementById('customRow').style.display = 'flex';
+    document.getElementById('customInput').focus();
+  }
+
+  function confirmCustom() {
+    const val = document.getElementById('customInput').value.trim();
+    if (!val) return;
+    selectedIssue = val;
+    applyIssue(val);
+  }
+
+  function applyIssue(name) {
+    document.querySelectorAll('[data-ph="issue"]').forEach(el => {
+      el.textContent = name;
+    });
+    const confirm = document.getElementById('selectionConfirm');
+    document.getElementById('selectedIssueName').textContent = name;
+    confirm.style.display = 'block';
+  }
+
+  /* ── COPY PROMPT ── */
+  function copyPrompt(btn) {
+    const body = btn.closest('.prompt-terminal').querySelector('.prompt-body code');
+    navigator.clipboard.writeText(body.innerText).then(() => {
+      btn.textContent = '✓ Copied!';
+      btn.classList.add('copied');
+      setTimeout(() => { btn.textContent = '⎘ Copy'; btn.classList.remove('copied'); }, 2000);
+    }).catch(() => {
+      btn.textContent = '(select & copy manually)';
+    });
+  }
+
+  /* ── PROGRESS DOTS ── */
+  const SECTIONS = ['background', 'task0', 'task1', 'task2', 'task3', 'task4', 'reflection', 'submission'];
+  const SECTION_LABELS = ['Background', 'Choose Issue', 'Task 1', 'Task 2', 'Task 3', 'Task 4', 'Reflection', 'Submit'];
+
+  function buildDots() {
+    const track = document.getElementById('progressTrack');
+    SECTIONS.forEach((s, i) => {
+      const btn = document.createElement('button');
+      btn.className = 'pdot';
+      btn.title = SECTION_LABELS[i];
+      btn.setAttribute('aria-label', SECTION_LABELS[i]);
+      btn.onclick = () => {
+        const el = document.querySelector(`[data-section="${s}"]`);
+        if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      };
+      track.appendChild(btn);
+    });
+  }
+
+  function updateDots() {
+    const dots = document.querySelectorAll('.pdot');
+    SECTIONS.forEach((s, i) => {
+      const el = document.querySelector(`[data-section="${s}"]`);
+      if (!el) return;
+      const textareas = el.querySelectorAll('textarea');
+      const filled = Array.from(textareas).filter(t => t.value.trim().length > 20);
+      const rect = el.getBoundingClientRect();
+      const inView = rect.top < window.innerHeight * 0.6 && rect.bottom > 0;
+      if (textareas.length > 0 && filled.length === textareas.length) {
+        dots[i].classList.add('done');
+        dots[i].classList.remove('active');
+      } else if (inView) {
+        dots[i].classList.add('active');
+        dots[i].classList.remove('done');
+      } else {
+        dots[i].classList.remove('active', 'done');
+      }
+    });
+  }
+
+  window.addEventListener('scroll', updateDots, { passive: true });
+  document.addEventListener('input', updateDots);
+  buildDots();
+  updateDots();
+
+  /* ── SUBMISSION ── */
+  function prepareSubmission() {
+    const answers = [];
+    document.querySelectorAll('textarea[data-label]').forEach(ta => {
+      answers.push({ label: ta.dataset.label, value: ta.value.trim() || '(no response entered)' });
+    });
+
+    const body = document.getElementById('modalBody');
+    const date = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+    const issue = selectedIssue || '(not selected)';
+
+    let html = `<p><strong>Date:</strong> ${date} &nbsp;|&nbsp; <strong>Issue:</strong> ${issue}</p><hr style="margin:12px 0; border-color:#eee;">`;
+    answers.forEach(a => {
+      html += `<div class="modal-answer">
+        <div class="label">${escHtml(a.label)}</div>
+        <div class="value">${escHtml(a.value)}</div>
+      </div>`;
+    });
+    html += `<p style="font-size:.8rem;color:#aaa;margin-top:16px;">Remember to attach all four screenshots to your Canvas submission.</p>`;
+    body.innerHTML = html;
+    document.getElementById('submissionModal').classList.remove('hidden');
+  }
+
+  function closeModal() {
+    document.getElementById('submissionModal').classList.add('hidden');
+  }
+
+  function printSubmission() {
+    const date = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+    const issue = selectedIssue || '(not selected)';
+    const answers = [];
+    document.querySelectorAll('textarea[data-label]').forEach(ta => {
+      answers.push({ label: ta.dataset.label, value: ta.value.trim() || '(no response entered)' });
+    });
+
+    const w = window.open('', '_blank');
+    w.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Exercise 1 Submission</title>
+    <style>
+      body { font-family: Georgia, serif; max-width: 680px; margin: 40px auto; color: #111; font-size: 13pt; line-height: 1.6; }
+      h1 { font-size: 1.4rem; color: #011F5B; border-bottom: 2px solid #011F5B; padding-bottom: 8px; margin-bottom: 4px; }
+      .meta { font-size: .9rem; color: #666; margin-bottom: 28px; }
+      .answer { margin-bottom: 22px; page-break-inside: avoid; }
+      .q-label { font-size: .78rem; font-weight: bold; color: #990000; text-transform: uppercase; letter-spacing: .05em; margin-bottom: 6px; }
+      .q-text { white-space: pre-wrap; background: #f9f9f9; padding: 12px 14px; border-left: 3px solid #ddd; font-size: .95rem; }
+      hr { border: none; border-top: 1px solid #eee; margin: 24px 0; }
+      .footer { margin-top: 40px; font-size: .78rem; color: #aaa; text-align: center; }
+    </style></head><body>
+    <h1>Exercise 1: The Prompt Lab</h1>
+    <p class="meta">University of Pennsylvania — LPS AI Literacy Course<br>
+    Date: ${date} &nbsp;|&nbsp; Issue selected: <strong>${escHtml(issue)}</strong></p>
+    <hr>
+    ${answers.map(a => `<div class="answer">
+      <div class="q-label">${escHtml(a.label)}</div>
+      <div class="q-text">${escHtml(a.value)}</div>
+    </div>`).join('')}
+    <div class="footer">Save as PDF and upload to Canvas with your four screenshots.</div>
+    </body></html>`);
+    w.document.close();
+    setTimeout(() => w.print(), 400);
+  }
+
+  function escHtml(s) {
+    return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  }
+
+  // Close modal on overlay click
+  document.getElementById('submissionModal').addEventListener('click', function(e) {
+    if (e.target === this) closeModal();
+  });
+</script>
+</body>
+</html>

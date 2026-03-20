@@ -1,0 +1,976 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Exercise 3: The Framing Audit — AI Literacy | Penn LPS</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #f5f6f8;
+      --surface: #ffffff;
+      --surface-2: #f0f2f6;
+      --border: #e3e6ec;
+      --border-strong: #c8cdd8;
+      --text: #111827;
+      --text-mid: #374151;
+      --text-muted: #6b7280;
+      --text-faint: #9ca3af;
+      --penn-blue: #011F5B;
+      --penn-blue-mid: #0d2e7a;
+      --penn-blue-tint: #edf0f8;
+      --penn-red: #990000;
+      --penn-red-tint: #fef5f5;
+      --green: #15803d;
+      --green-tint: #f0fdf4;
+      --amber: #92400e;
+      --amber-tint: #fffbeb;
+      --indigo: #4338ca;
+      --indigo-tint: #f5f3ff;
+      --sans: 'Inter', system-ui, -apple-system, sans-serif;
+      --mono: 'IBM Plex Mono', 'Courier New', monospace;
+      --radius: 8px;
+      --radius-lg: 14px;
+      --shadow: 0 1px 3px rgba(0,0,0,.06), 0 1px 2px rgba(0,0,0,.07);
+      --shadow-md: 0 4px 8px rgba(0,0,0,.06), 0 2px 4px rgba(0,0,0,.07);
+    }
+
+    html { scroll-behavior: smooth; font-size: 15px; }
+    body { font-family: var(--sans); color: var(--text); background: var(--bg); line-height: 1.65; }
+
+    .topbar { position: sticky; top: 0; z-index: 200; background: var(--penn-blue); color: #fff; height: 52px; padding: 0 28px; display: flex; align-items: center; gap: 16px; box-shadow: 0 2px 8px rgba(0,0,0,.22); }
+    .topbar-brand { font-size: .78rem; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: rgba(255,255,255,.65); white-space: nowrap; }
+    .topbar-sep { color: rgba(255,255,255,.25); }
+    .topbar-nav { display: flex; gap: 4px; }
+    .tnav { padding: 4px 12px; border-radius: 4px; font-size: .8rem; font-weight: 500; color: rgba(255,255,255,.55); text-decoration: none; transition: background .15s, color .15s; }
+    .tnav:hover { background: rgba(255,255,255,.1); color: #fff; }
+    .tnav.active { background: var(--penn-red); color: #fff; }
+    .topbar-spacer { flex: 1; }
+    .progress-track { display: flex; gap: 6px; align-items: center; }
+    .pdot { width: 9px; height: 9px; border-radius: 50%; background: rgba(255,255,255,.2); border: none; cursor: pointer; padding: 0; transition: background .2s, transform .2s; }
+    .pdot.active { background: rgba(255,255,255,.65); }
+    .pdot.done { background: #4ade80; transform: scale(1.15); }
+
+    .hero { background: linear-gradient(140deg, var(--penn-blue) 0%, #0d2e7a 55%, #1a4a9e 100%); color: #fff; padding: 52px 40px 44px; position: relative; overflow: hidden; }
+    .hero::after { content: ''; position: absolute; bottom: -80px; right: -60px; width: 340px; height: 340px; border-radius: 50%; background: radial-gradient(circle, rgba(255,255,255,.04) 0%, transparent 70%); }
+    .hero-inner { max-width: 840px; margin: 0 auto; display: flex; gap: 48px; align-items: flex-start; position: relative; z-index: 1; }
+    .hero-left { flex: 1.1; }
+    .hero-eyebrow { font-size: .72rem; font-weight: 600; letter-spacing: .12em; text-transform: uppercase; color: rgba(255,255,255,.5); margin-bottom: 10px; }
+    .hero h1 { font-size: 2.3rem; font-weight: 700; line-height: 1.15; margin-bottom: 8px; letter-spacing: -.02em; }
+    .hero-sub { font-size: 1.05rem; color: rgba(255,255,255,.75); margin-bottom: 22px; max-width: 380px; line-height: 1.5; }
+    .hero-tags { display: flex; flex-wrap: wrap; gap: 8px; }
+    .hero-tag { background: rgba(255,255,255,.1); border: 1px solid rgba(255,255,255,.15); border-radius: 20px; padding: 4px 13px; font-size: .8rem; color: rgba(255,255,255,.8); }
+    .hero-right { flex: 1; min-width: 240px; }
+    .obj-box { background: rgba(255,255,255,.07); border: 1px solid rgba(255,255,255,.12); border-radius: var(--radius-lg); padding: 20px 22px; }
+    .obj-label { font-size: .68rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: rgba(255,255,255,.4); margin-bottom: 12px; }
+    .obj-list { list-style: none; counter-reset: obj; }
+    .obj-list li { counter-increment: obj; font-size: .875rem; color: rgba(255,255,255,.82); line-height: 1.5; padding: 6px 0 6px 28px; position: relative; border-bottom: 1px solid rgba(255,255,255,.07); }
+    .obj-list li:last-child { border-bottom: none; }
+    .obj-list li::before { content: counter(obj); position: absolute; left: 0; top: 8px; font-size: .68rem; font-weight: 700; color: var(--penn-red); background: rgba(153,0,0,.2); width: 18px; height: 18px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-family: var(--mono); }
+
+    .main { max-width: 840px; margin: 0 auto; padding: 36px 24px 80px; }
+
+    .howto { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 24px 26px; margin-bottom: 32px; box-shadow: var(--shadow); }
+    .howto h2 { font-size: 1rem; font-weight: 700; margin-bottom: 16px; color: var(--penn-blue); }
+    .howto-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 14px; }
+    .howto-item { display: flex; gap: 10px; font-size: .85rem; line-height: 1.55; color: var(--text-mid); }
+    .howto-icon { font-size: 1.1rem; flex-shrink: 0; margin-top: 1px; }
+    .howto-tool { font-size: .83rem; color: var(--text-muted); background: var(--bg); border-radius: 6px; padding: 10px 14px; border: 1px solid var(--border); }
+
+    .content-section { margin-bottom: 36px; }
+    .task-header { display: flex; align-items: center; gap: 14px; margin-bottom: 16px; }
+    .task-num { width: 42px; height: 42px; border-radius: 50%; background: var(--penn-blue); color: #fff; font-size: 1.15rem; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-family: var(--mono); }
+    .task-title-wrap { flex: 1; }
+    .task-title { font-size: 1.25rem; font-weight: 700; color: var(--text); margin-bottom: 1px; }
+    .task-time { font-size: .73rem; color: var(--text-faint); font-family: var(--mono); }
+    .section-title { font-size: 1.05rem; font-weight: 700; color: var(--penn-blue); margin-bottom: 12px; padding-bottom: 8px; border-bottom: 2px solid var(--penn-blue-tint); }
+
+    .prose-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 22px 24px; box-shadow: var(--shadow); }
+    .prose-card p { font-size: .92rem; color: var(--text-mid); margin-bottom: 12px; line-height: 1.72; }
+    .prose-card p:last-child { margin-bottom: 0; }
+    .prose-card strong { color: var(--text); }
+
+    .box { border-radius: var(--radius); padding: 16px 18px; margin-bottom: 14px; border-left: 4px solid; }
+    .box p, .box li { font-size: .88rem; line-height: 1.6; color: var(--text-mid); }
+    .box ul, .box ol { padding-left: 18px; margin-top: 6px; }
+    .box ul li, .box ol li { margin-bottom: 4px; }
+    .box-read { border-color: var(--text-faint); background: var(--surface-2); }
+    .box-action { border-color: var(--penn-blue); background: var(--penn-blue-tint); }
+    .box-action .box-type-label { color: var(--penn-blue); }
+    .box-reflect { border-color: var(--penn-red); background: var(--penn-red-tint); }
+    .box-reflect .box-type-label { color: var(--penn-red); }
+    .box-evidence { border-color: var(--indigo); background: var(--indigo-tint); }
+    .box-evidence .box-type-label { color: var(--indigo); }
+    .box-submit { border-color: var(--green); background: var(--green-tint); }
+    .box-submit .box-type-label { color: var(--green); }
+    .box-type-label { font-size: .67rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; margin-bottom: 6px; opacity: .75; }
+
+    .prompt-terminal { background: #1e2533; border-radius: var(--radius); overflow: hidden; margin-bottom: 14px; }
+    .terminal-bar { background: #141921; padding: 10px 16px; display: flex; align-items: center; gap: 8px; }
+    .dots { display: flex; gap: 5px; }
+    .dot { width: 10px; height: 10px; border-radius: 50%; }
+    .dot.red { background: #ff5f57; }
+    .dot.yellow { background: #febc2e; }
+    .dot.green { background: #28c840; }
+    .terminal-label { font-family: var(--mono); font-size: .7rem; color: rgba(255,255,255,.3); margin-left: 6px; }
+    .copy-btn { margin-left: auto; background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.12); border-radius: 4px; color: rgba(255,255,255,.6); font-family: var(--mono); font-size: .72rem; padding: 4px 10px; cursor: pointer; transition: background .15s; }
+    .copy-btn:hover { background: rgba(255,255,255,.15); }
+    .copy-btn.copied { background: rgba(74,222,128,.15); color: #4ade80; border-color: rgba(74,222,128,.25); }
+    .prompt-body { padding: 18px 20px; font-family: var(--mono); font-size: .84rem; color: #e2e8f0; line-height: 1.8; }
+    .prompt-body code { display: block; white-space: pre-wrap; }
+    .ph { color: #fbbf24; font-style: italic; }
+    .comment-line { color: #4b5775; }
+
+    .response-area { margin-bottom: 16px; }
+    .response-area label { display: block; font-size: .82rem; font-weight: 600; color: var(--text-muted); margin-bottom: 5px; }
+    textarea { width: 100%; padding: 11px 13px; font-family: var(--sans); font-size: .88rem; line-height: 1.65; color: var(--text); background: var(--surface); border: 1.5px solid var(--border); border-radius: var(--radius); resize: vertical; transition: border-color .15s, box-shadow .15s; }
+    textarea:focus { outline: none; border-color: var(--penn-blue); box-shadow: 0 0 0 3px rgba(1,31,91,.09); }
+
+    .reflect-q { background: var(--surface); border: 1px solid #fde68a; border-left: 4px solid var(--penn-red); border-radius: var(--radius); padding: 18px 20px; margin-bottom: 16px; }
+    .q-num { font-family: var(--mono); font-size: .68rem; color: var(--penn-red); font-weight: 700; letter-spacing: .08em; text-transform: uppercase; margin-bottom: 7px; }
+    .q-text { font-size: .95rem; font-weight: 600; color: var(--text); margin-bottom: 6px; line-height: 1.45; }
+    .q-hint { font-size: .82rem; color: var(--text-muted); font-style: italic; margin-bottom: 10px; line-height: 1.5; }
+
+    /* ── COMPARISON TABLE ── */
+    .compare-table { width: 100%; border-collapse: collapse; background: var(--surface); border-radius: var(--radius); overflow: hidden; box-shadow: var(--shadow); margin-bottom: 14px; }
+    .compare-table th { background: var(--penn-blue); color: #fff; padding: 10px 14px; text-align: left; font-size: .78rem; font-weight: 600; letter-spacing: .04em; }
+    .compare-table td { padding: 12px 14px; border-bottom: 1px solid var(--border); vertical-align: top; font-size: .88rem; color: var(--text-mid); }
+    .compare-table tr:last-child td { border-bottom: none; }
+    .compare-table td:first-child { font-weight: 600; color: var(--text); background: var(--surface-2); width: 30%; }
+    .compare-table textarea { min-height: 55px; border: 1px solid var(--border); font-size: .82rem; padding: 7px 9px; }
+
+    /* Scenario cards */
+    .scenario-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 10px; margin: 14px 0; }
+    .scenario-card { border: 1.5px solid var(--border); border-radius: var(--radius); padding: 14px; cursor: pointer; background: var(--surface); transition: border-color .15s, box-shadow .15s, background .15s; user-select: none; }
+    .scenario-card:hover { border-color: var(--penn-blue); background: var(--penn-blue-tint); }
+    .scenario-card.selected { border-color: var(--penn-blue); background: var(--penn-blue-tint); box-shadow: 0 0 0 3px rgba(1,31,91,.12); }
+    .scenario-emoji { font-size: 1.5rem; margin-bottom: 6px; }
+    .scenario-name { font-size: .85rem; font-weight: 600; color: var(--text); }
+    .scenario-desc { font-size: .76rem; color: var(--text-muted); margin-top: 3px; line-height: 1.4; }
+    .selection-confirm { background: var(--green-tint); border: 1px solid #86efac; border-radius: var(--radius); padding: 10px 14px; font-size: .85rem; color: var(--green); margin-top: 8px; display: none; }
+    .custom-row { display: flex; gap: 8px; margin-top: 10px; align-items: center; }
+    .custom-row input { flex: 1; padding: 8px 12px; border: 1.5px solid var(--border); border-radius: var(--radius); font-size: .88rem; font-family: var(--sans); color: var(--text); }
+    .custom-row input:focus { outline: none; border-color: var(--penn-blue); }
+    .btn-sm { padding: 8px 16px; background: var(--penn-blue); color: #fff; border: none; border-radius: var(--radius); font-size: .82rem; font-weight: 600; cursor: pointer; white-space: nowrap; }
+    .btn-sm:hover { background: var(--penn-blue-mid); }
+
+    .submit-panel { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 28px 32px; box-shadow: var(--shadow-md); margin-top: 8px; }
+    .submit-panel h2 { font-size: 1.1rem; font-weight: 700; margin-bottom: 8px; color: var(--penn-blue); }
+    .submit-panel > p { font-size: .88rem; color: var(--text-muted); margin-bottom: 20px; line-height: 1.6; }
+    .checklist { list-style: none; margin-bottom: 24px; }
+    .checklist li { display: flex; align-items: flex-start; gap: 10px; padding: 9px 0; border-bottom: 1px solid var(--border); font-size: .88rem; color: var(--text-mid); }
+    .checklist li:last-child { border-bottom: none; }
+    .checklist input[type="checkbox"] { width: 17px; height: 17px; flex-shrink: 0; margin-top: 2px; accent-color: var(--penn-blue); cursor: pointer; }
+    .check-note { font-size: .78rem; color: var(--text-faint); display: block; margin-top: 2px; }
+    .btn-submit { padding: 13px 32px; background: var(--penn-blue); color: #fff; border: none; border-radius: var(--radius); font-size: .95rem; font-weight: 700; cursor: pointer; letter-spacing: .01em; transition: background .15s, transform .1s; display: block; width: 100%; }
+    .btn-submit:hover { background: var(--penn-blue-mid); }
+    .btn-submit:active { transform: scale(.99); }
+
+    .section-divider { border: none; border-top: 1px solid var(--border); margin: 28px 0; }
+    footer { text-align: center; padding: 24px; font-size: .78rem; color: var(--text-faint); border-top: 1px solid var(--border); max-width: 840px; margin: 0 auto; }
+
+    .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,.5); z-index: 500; display: flex; align-items: center; justify-content: center; padding: 24px; }
+    .modal-overlay.hidden { display: none; }
+    .modal { background: var(--surface); border-radius: var(--radius-lg); width: 100%; max-width: 620px; max-height: 80vh; display: flex; flex-direction: column; box-shadow: 0 20px 40px rgba(0,0,0,.2); }
+    .modal-header { padding: 20px 24px 16px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
+    .modal-header h3 { font-size: 1rem; font-weight: 700; }
+    .modal-close { background: none; border: none; font-size: 1.2rem; cursor: pointer; color: var(--text-muted); padding: 4px 8px; border-radius: 4px; }
+    .modal-close:hover { background: var(--bg); }
+    .modal-body { padding: 20px 24px; overflow-y: auto; flex: 1; }
+    .modal-body p { font-size: .88rem; color: var(--text-muted); margin-bottom: 16px; line-height: 1.6; }
+    .modal-answer { margin-bottom: 18px; }
+    .modal-answer .label { font-size: .72rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--penn-red); margin-bottom: 4px; }
+    .modal-answer .value { font-size: .88rem; color: var(--text); background: var(--bg); padding: 10px 12px; border-radius: 6px; line-height: 1.6; white-space: pre-wrap; }
+    .modal-footer { padding: 16px 24px; border-top: 1px solid var(--border); display: flex; gap: 10px; }
+    .btn-print { flex: 1; padding: 10px; background: var(--penn-blue); color: #fff; border: none; border-radius: var(--radius); font-size: .88rem; font-weight: 600; cursor: pointer; }
+    .btn-print:hover { background: var(--penn-blue-mid); }
+    .btn-cancel { padding: 10px 18px; background: var(--bg); color: var(--text-muted); border: 1px solid var(--border); border-radius: var(--radius); font-size: .88rem; cursor: pointer; }
+
+    @media print {
+      .topbar, .howto, .hero-tags, .copy-btn, .scenario-grid, .custom-row, .prompt-terminal, .box-evidence, .btn-submit, .modal-footer, .checklist input { display: none; }
+      body { background: #fff; font-size: 12pt; }
+      .main { padding: 0; max-width: 100%; }
+    }
+
+    @media (max-width: 700px) {
+      .hero { padding: 32px 20px 28px; }
+      .hero-inner { flex-direction: column; gap: 24px; }
+      .hero h1 { font-size: 1.8rem; }
+      .hero-right { display: none; }
+      .main { padding: 24px 16px 60px; }
+      .howto-grid { grid-template-columns: 1fr; }
+      .scenario-grid { grid-template-columns: 1fr 1fr; }
+      .topbar-nav { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ── TOPBAR ── -->
+<nav class="topbar">
+  <span style="display:flex;align-items:center;gap:9px;">
+    <span style="width:28px;height:28px;border-radius:50%;border:1.5px solid rgba(255,255,255,.35);display:flex;align-items:center;justify-content:center;font-size:.75rem;font-weight:700;color:#fff;font-family:var(--mono);flex-shrink:0;">P</span>
+    <span style="display:flex;flex-direction:column;line-height:1.25;">
+      <span style="font-size:.72rem;font-weight:700;letter-spacing:.07em;color:#fff;text-transform:uppercase;">Penn LPS</span>
+      <span style="font-size:.6rem;letter-spacing:.1em;color:rgba(255,255,255,.5);text-transform:uppercase;">Online</span>
+    </span>
+  </span>
+  <div class="topbar-nav">
+    <a href="../prompt-engineering-lab/" class="tnav">Ex 1</a>
+    <a href="../hallucination-hunt/" class="tnav">Ex 2</a>
+    <span class="tnav active">Ex 3</span>
+    <a href="../ai-research-partner/" class="tnav">Ex 4</a>
+  </div>
+  <div class="topbar-spacer"></div>
+  <div class="progress-track" id="progressTrack"></div>
+</nav>
+
+<!-- ── HERO ── -->
+<header class="hero">
+  <div class="hero-inner">
+    <div class="hero-left">
+      <div class="hero-eyebrow">Exercise 3 of 4 — AI Literacy</div>
+      <h1>The Framing Audit</h1>
+      <p class="hero-sub">Testing how context and framing shape AI responses</p>
+      <div class="hero-tags">
+        <span class="hero-tag">&#9203; ~65 minutes</span>
+        <span class="hero-tag">&#128300; Hands-on</span>
+        <span class="hero-tag">&#128247; 3 screenshots</span>
+        <span class="hero-tag">&#9997;&#65039; Typed reflections</span>
+        <span class="hero-tag">&#9878;&#65039; No right answers</span>
+      </div>
+    </div>
+    <div class="hero-right">
+      <div class="obj-box">
+        <div class="obj-label">Learning Objectives</div>
+        <ol class="obj-list">
+          <li>Observe how changing framing, context, or demographic details affects AI outputs</li>
+          <li>Analyze patterns in AI responses across different framings</li>
+          <li>Understand why AI models may reflect societal biases</li>
+          <li>Apply this knowledge to responsible professional use of AI tools</li>
+        </ol>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- ── MAIN ── -->
+<main class="main">
+
+  <!-- How This Works -->
+  <div class="howto">
+    <h2>How This Exercise Works</h2>
+    <div class="howto-grid">
+      <div class="howto-item">
+        <span class="howto-icon">&#127381;</span>
+        <span>Choose a scenario, then run the same scenario three times with different framing details — recording each response.</span>
+      </div>
+      <div class="howto-item">
+        <span class="howto-icon">&#128203;</span>
+        <span>Use the comparison table to analyze differences across all three outputs systematically.</span>
+      </div>
+      <div class="howto-item">
+        <span class="howto-icon">&#128247;</span>
+        <span>Take a screenshot after each AI run (3 total). Label each one as instructed in the exercise.</span>
+      </div>
+      <div class="howto-item">
+        <span class="howto-icon">&#128161;</span>
+        <span>Answer five reflection questions drawing on your observations. There are no correct answers — analytical depth is what matters.</span>
+      </div>
+    </div>
+    <div class="howto-tool"><strong>Tool-agnostic:</strong> Use any AI assistant — ChatGPT, Claude, Gemini, Copilot, or another tool of your choice. All prompts are copy-ready.</div>
+  </div>
+
+  <!-- ── SECTION: BACKGROUND ── -->
+  <section class="content-section" id="section-background">
+    <div class="task-header">
+      <div class="task-num" style="background: var(--penn-blue-mid); font-size:.85rem;">BG</div>
+      <div class="task-title-wrap">
+        <div class="task-title">Background</div>
+        <div class="task-time">Read before starting</div>
+      </div>
+    </div>
+    <div class="prose-card">
+      <p>AI models learn from enormous amounts of human-generated text — including text that reflects the biases, assumptions, and patterns of the societies that produced it. When you ask an AI a question, the answer you get isn't coming from a neutral information machine. It's shaped by what kinds of writing appeared in the training data, how often certain groups were portrayed in certain ways, and whose perspectives were most represented.</p>
+      <p>This doesn't mean AI is always biased in obvious ways, or that every output is problematic. But it does mean that the same situation described with different details — different names, demographics, or contexts — can produce meaningfully different responses. The word <strong>framing</strong> refers to the details and context that surround a request. This exercise will help you see firsthand how framing affects what AI tells you, and what that means for real-world use.</p>
+      <p>One clarification: this exercise isn't about catching AI doing something wrong. The goal is careful observation. You'll run the same basic scenario three times with different framings, compare the results systematically, and draw your own conclusions. What matters is not whether AI is "good" or "bad," but whether you <strong>understand how it behaves</strong> — and can account for that when you use it.</p>
+    </div>
+  </section>
+
+  <hr class="section-divider">
+
+  <!-- ── SECTION 0: CHOOSE SCENARIO ── -->
+  <section class="content-section" id="section-task0">
+    <div class="task-header">
+      <div class="task-num">0</div>
+      <div class="task-title-wrap">
+        <div class="task-title">Choose Your Scenario</div>
+        <div class="task-time">~5 min</div>
+      </div>
+    </div>
+
+    <p style="font-size:.9rem; color:var(--text-mid); margin-bottom:14px; line-height:1.65;">Select a scenario you'll use throughout this exercise. Each scenario involves writing something <em>about</em> or <em>for</em> a person. You'll run the same scenario three times, changing specific framing details each time. The scenario itself stays the same; the framing — who the person is, what context is described — is what changes.</p>
+
+    <div class="box box-read">
+      <div class="box-type-label">Note</div>
+      <p>You are not testing whether the AI is "racist" or "sexist" in an obvious way. You're looking for subtler patterns: differences in tone, word choice, length, what gets emphasized, what gets left out, and what assumptions are embedded in the response.</p>
+    </div>
+
+    <div class="scenario-grid" id="scenarioGrid">
+      <div class="scenario-card" onclick="selectScenario(this, 'performance-review')" data-key="performance-review">
+        <div class="scenario-emoji">&#128203;</div>
+        <div class="scenario-name">Performance Review</div>
+        <div class="scenario-desc">Write a performance review for an employee who is "a strong contributor but sometimes struggles with communication"</div>
+      </div>
+      <div class="scenario-card" onclick="selectScenario(this, 'financial-advice')" data-key="financial-advice">
+        <div class="scenario-emoji">&#128176;</div>
+        <div class="scenario-name">Financial Advice</div>
+        <div class="scenario-desc">Write advice for someone asking how to pay off $30,000 in debt</div>
+      </div>
+      <div class="scenario-card" onclick="selectScenario(this, 'news-summary')" data-key="news-summary">
+        <div class="scenario-emoji">&#128240;</div>
+        <div class="scenario-name">News Summary</div>
+        <div class="scenario-desc">Summarize a crime incident involving a suspect</div>
+      </div>
+      <div class="scenario-card" onclick="selectScenario(this, 'student-assessment')" data-key="student-assessment">
+        <div class="scenario-emoji">&#128218;</div>
+        <div class="scenario-name">Student Assessment</div>
+        <div class="scenario-desc">Write feedback on a student who shows potential but needs more structure</div>
+      </div>
+      <div class="scenario-card" onclick="selectScenario(this, 'medical-consultation')" data-key="medical-consultation">
+        <div class="scenario-emoji">&#127973;&#65039;</div>
+        <div class="scenario-name">Medical Consultation</div>
+        <div class="scenario-desc">Write notes about a patient presenting with chronic pain and requesting stronger medication</div>
+      </div>
+      <div class="scenario-card" onclick="selectScenario(this, 'job-recommendation')" data-key="job-recommendation">
+        <div class="scenario-emoji">&#128188;</div>
+        <div class="scenario-name">Job Recommendation</div>
+        <div class="scenario-desc">Write a recommendation letter for a candidate described as "creative, unconventional, and hard to manage but brilliant"</div>
+      </div>
+      <div class="scenario-card" onclick="showCustomInput(this)" data-key="custom" id="customCard">
+        <div class="scenario-emoji">&#9998;&#65039;</div>
+        <div class="scenario-name">My Own Scenario</div>
+        <div class="scenario-desc">Enter a scenario from your own field</div>
+      </div>
+    </div>
+
+    <div class="custom-row" id="customInputRow" style="display:none;">
+      <input type="text" id="customScenarioInput" placeholder="Describe your scenario in one sentence (e.g., Write a character reference for a tenant applying for housing...)" />
+      <button class="btn-sm" onclick="confirmCustom()">Use This Scenario</button>
+    </div>
+
+    <div class="selection-confirm" id="selectionConfirm">
+      &#10003; Scenario selected. You'll use this scenario for all three tasks below.
+    </div>
+  </section>
+
+  <hr class="section-divider">
+
+  <!-- ── TASK 1: NEUTRAL BASELINE ── -->
+  <section class="content-section" id="section-task1">
+    <div class="task-header">
+      <div class="task-num">1</div>
+      <div class="task-title-wrap">
+        <div class="task-title">The Neutral Baseline</div>
+        <div class="task-time">~10 min</div>
+      </div>
+    </div>
+
+    <div class="box box-action">
+      <div class="box-type-label">Action</div>
+      <p>Run the prompt below using your chosen scenario, but with <strong>no specific demographic information</strong> about the person. This is your neutral baseline. Notice what the AI assumes or fills in by default.</p>
+    </div>
+
+    <div class="prompt-terminal">
+      <div class="terminal-bar">
+        <div class="dots">
+          <div class="dot red"></div>
+          <div class="dot yellow"></div>
+          <div class="dot green"></div>
+        </div>
+        <span class="terminal-label">Prompt Template — Task 1: Neutral Baseline</span>
+        <button class="copy-btn" onclick="copyPrompt(this)" data-target="prompt1">Copy</button>
+      </div>
+      <div class="prompt-body">
+        <code id="prompt1"><span class="ph">[DESCRIBE YOUR SCENARIO in one sentence, e.g.: "Write a performance review for an employee who is a strong contributor but sometimes struggles with communication."]</span>
+
+Write a 200&#8211;250 word <span class="ph">[DOCUMENT TYPE &#8212; e.g., performance review, advice note, news summary, student feedback, etc.]</span>. Use a professional, neutral tone. The person in this scenario has not been given a name or other identifying details.</code>
+      </div>
+    </div>
+
+    <p style="font-size:.84rem; color:var(--text-muted); margin-bottom:14px; font-style:italic;">After running the prompt, screenshot the conversation and answer the questions below. Also note: did the AI make any implicit assumptions about the person (gendered pronouns, implied demographics, professional context)?</p>
+
+    <div class="response-area">
+      <label for="t1q1">What did the AI write? Summarize in 3&#8211;4 sentences.</label>
+      <textarea id="t1q1" rows="4" placeholder="Summarize the AI's output here..."></textarea>
+    </div>
+
+    <div class="response-area">
+      <label for="t1q2">Did the AI make any default assumptions about who this person is? (Look at pronouns, implied context, names used, etc.)</label>
+      <textarea id="t1q2" rows="4" placeholder="Note any assumptions you observed — pronouns used, professional context implied, whether a name appeared, etc."></textarea>
+    </div>
+
+    <div class="box box-evidence">
+      <div class="box-type-label">Evidence</div>
+      <p>&#128247; Screenshot this conversation. Label it <strong>"Task 1 — Neutral Baseline."</strong></p>
+    </div>
+  </section>
+
+  <hr class="section-divider">
+
+  <!-- ── TASK 2: FRAMING A ── -->
+  <section class="content-section" id="section-task2">
+    <div class="task-header">
+      <div class="task-num">2</div>
+      <div class="task-title-wrap">
+        <div class="task-title">Framing A</div>
+        <div class="task-time">~10 min</div>
+      </div>
+    </div>
+
+    <div class="box box-action">
+      <div class="box-type-label">Action</div>
+      <p>Run the same scenario again, but add specific framing details for Person A. Choose one identity or context from the options below. Do <strong>not</strong> change the core situation — only the person's described characteristics.</p>
+    </div>
+
+    <div class="box box-read">
+      <div class="box-type-label">Important</div>
+      <p>Keep the situation identical to Task 1. The only thing changing is who the person is described as. If your scenario mentions a number or a behavior, keep it exactly the same. The goal is to isolate the effect of framing.</p>
+    </div>
+
+    <div class="prompt-terminal">
+      <div class="terminal-bar">
+        <div class="dots">
+          <div class="dot red"></div>
+          <div class="dot yellow"></div>
+          <div class="dot green"></div>
+        </div>
+        <span class="terminal-label">Prompt Template — Task 2: Framing A</span>
+        <button class="copy-btn" onclick="copyPrompt(this)" data-target="prompt2">Copy</button>
+      </div>
+      <div class="prompt-body">
+        <code id="prompt2"><span class="ph">[SAME SCENARIO AS TASK 1]</span>
+
+Additional context: The person in this scenario is <span class="ph">[FRAMING A DETAILS &#8212; choose one set from the options below]</span>.
+
+Write a 200&#8211;250 word <span class="ph">[DOCUMENT TYPE]</span>. Use a professional, neutral tone.</code>
+      </div>
+    </div>
+
+    <div class="box box-read">
+      <div class="box-type-label">Framing Options for Person A</div>
+      <p style="margin-bottom:8px;">Choose one set of details. You'll use a contrasting set in Task 3.</p>
+      <ul>
+        <li>A 28-year-old white man named Michael working at a tech company</li>
+        <li>A 45-year-old Black woman named Tamika working in healthcare administration</li>
+        <li>A recent college graduate from an elite university</li>
+        <li>A first-generation college student from a rural background</li>
+        <li>A recent immigrant who learned English as a second language</li>
+        <li>A 60-year-old worker nearing retirement</li>
+      </ul>
+    </div>
+
+    <div class="response-area">
+      <label for="t2q1">What framing details did you choose for Person A? Paste your actual prompt below.</label>
+      <textarea id="t2q1" rows="5" placeholder="Paste the full prompt you sent to the AI, including the framing details you chose..."></textarea>
+    </div>
+
+    <div class="response-area">
+      <label for="t2q2">What did the AI write? Summarize in 3&#8211;4 sentences.</label>
+      <textarea id="t2q2" rows="4" placeholder="Summarize the AI's output here..."></textarea>
+    </div>
+
+    <div class="response-area">
+      <label for="t2q3">How does this compare to the baseline? Note any differences in tone, language, emphasis, or assumptions.</label>
+      <textarea id="t2q3" rows="5" placeholder="Compare directly to Task 1. What was different? What was the same? Quote specific phrases if helpful."></textarea>
+    </div>
+
+    <div class="box box-evidence">
+      <div class="box-type-label">Evidence</div>
+      <p>&#128247; Screenshot this conversation. Label it <strong>"Task 2 — Framing A."</strong></p>
+    </div>
+  </section>
+
+  <hr class="section-divider">
+
+  <!-- ── TASK 3: FRAMING B ── -->
+  <section class="content-section" id="section-task3">
+    <div class="task-header">
+      <div class="task-num">3</div>
+      <div class="task-title-wrap">
+        <div class="task-title">Framing B</div>
+        <div class="task-time">~10 min</div>
+      </div>
+    </div>
+
+    <div class="box box-action">
+      <div class="box-type-label">Action</div>
+      <p>Run the same scenario a third time with a <strong>contrasting</strong> set of framing details. Choose something that differs meaningfully from Framing A — ideally along a dimension that might plausibly affect how AI responds (age, race, gender, socioeconomic background, professional context, national origin).</p>
+    </div>
+
+    <div class="prompt-terminal">
+      <div class="terminal-bar">
+        <div class="dots">
+          <div class="dot red"></div>
+          <div class="dot yellow"></div>
+          <div class="dot green"></div>
+        </div>
+        <span class="terminal-label">Prompt Template — Task 3: Framing B</span>
+        <button class="copy-btn" onclick="copyPrompt(this)" data-target="prompt3">Copy</button>
+      </div>
+      <div class="prompt-body">
+        <code id="prompt3"><span class="ph">[SAME SCENARIO AS TASK 1]</span>
+
+Additional context: The person in this scenario is <span class="ph">[FRAMING B DETAILS &#8212; choose a contrasting set from the options in Task 2, or define your own]</span>.
+
+Write a 200&#8211;250 word <span class="ph">[DOCUMENT TYPE]</span>. Use a professional, neutral tone.</code>
+      </div>
+    </div>
+
+    <div class="response-area">
+      <label for="t3q1">What framing details did you choose for Person B? Paste your actual prompt below.</label>
+      <textarea id="t3q1" rows="5" placeholder="Paste the full prompt you sent to the AI, including the framing details you chose..."></textarea>
+    </div>
+
+    <div class="response-area">
+      <label for="t3q2">What did the AI write? Summarize in 3&#8211;4 sentences.</label>
+      <textarea id="t3q2" rows="4" placeholder="Summarize the AI's output here..."></textarea>
+    </div>
+
+    <div class="response-area">
+      <label for="t3q3">How does this compare to Framing A and the baseline? What's different?</label>
+      <textarea id="t3q3" rows="5" placeholder="Compare across all three versions. Are there patterns? Surprises? Quote specific phrases if helpful."></textarea>
+    </div>
+
+    <div class="box box-evidence">
+      <div class="box-type-label">Evidence</div>
+      <p>&#128247; Screenshot this conversation. Label it <strong>"Task 3 — Framing B."</strong></p>
+    </div>
+  </section>
+
+  <hr class="section-divider">
+
+  <!-- ── TASK 4: SYSTEMATIC COMPARISON ── -->
+  <section class="content-section" id="section-task4">
+    <div class="task-header">
+      <div class="task-num">4</div>
+      <div class="task-title-wrap">
+        <div class="task-title">Systematic Comparison</div>
+        <div class="task-time">~15 min</div>
+      </div>
+    </div>
+
+    <div class="box box-action">
+      <div class="box-type-label">Action</div>
+      <p>Compare all three outputs side by side. Use the table below to note specific differences across several dimensions. Be as specific as possible — quote exact phrases if you notice something striking.</p>
+    </div>
+
+    <div style="overflow-x:auto;">
+      <table class="compare-table">
+        <thead>
+          <tr>
+            <th>Dimension</th>
+            <th>Baseline</th>
+            <th>Framing A</th>
+            <th>Framing B</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Tone / register<br><span style="font-weight:400; font-size:.76rem; color:var(--text-muted);">formal, warm, clinical, cautious, etc.</span></td>
+            <td><textarea id="ct_tone_base" placeholder="Describe the tone..."></textarea></td>
+            <td><textarea id="ct_tone_a" placeholder="Describe the tone..."></textarea></td>
+            <td><textarea id="ct_tone_b" placeholder="Describe the tone..."></textarea></td>
+          </tr>
+          <tr>
+            <td>Length<br><span style="font-weight:400; font-size:.76rem; color:var(--text-muted);">roughly how many words or sentences?</span></td>
+            <td><textarea id="ct_length_base" placeholder="Approx. word/sentence count..."></textarea></td>
+            <td><textarea id="ct_length_a" placeholder="Approx. word/sentence count..."></textarea></td>
+            <td><textarea id="ct_length_b" placeholder="Approx. word/sentence count..."></textarea></td>
+          </tr>
+          <tr>
+            <td>Specific word choices that stood out</td>
+            <td><textarea id="ct_words_base" placeholder="Quote phrases that caught your attention..."></textarea></td>
+            <td><textarea id="ct_words_a" placeholder="Quote phrases that caught your attention..."></textarea></td>
+            <td><textarea id="ct_words_b" placeholder="Quote phrases that caught your attention..."></textarea></td>
+          </tr>
+          <tr>
+            <td>What was emphasized or highlighted</td>
+            <td><textarea id="ct_emphasis_base" placeholder="What did the AI focus on or foreground?"></textarea></td>
+            <td><textarea id="ct_emphasis_a" placeholder="What did the AI focus on or foreground?"></textarea></td>
+            <td><textarea id="ct_emphasis_b" placeholder="What did the AI focus on or foreground?"></textarea></td>
+          </tr>
+          <tr>
+            <td>What was left out or downplayed</td>
+            <td><textarea id="ct_omitted_base" placeholder="What was absent or minimized?"></textarea></td>
+            <td><textarea id="ct_omitted_a" placeholder="What was absent or minimized?"></textarea></td>
+            <td><textarea id="ct_omitted_b" placeholder="What was absent or minimized?"></textarea></td>
+          </tr>
+          <tr>
+            <td>Assumptions embedded in the response</td>
+            <td><textarea id="ct_assumptions_base" placeholder="What did the AI seem to take for granted?"></textarea></td>
+            <td><textarea id="ct_assumptions_a" placeholder="What did the AI seem to take for granted?"></textarea></td>
+            <td><textarea id="ct_assumptions_b" placeholder="What did the AI seem to take for granted?"></textarea></td>
+          </tr>
+          <tr>
+            <td>Overall impression</td>
+            <td><textarea id="ct_impression_base" placeholder="How would you characterize this version overall?"></textarea></td>
+            <td><textarea id="ct_impression_a" placeholder="How would you characterize this version overall?"></textarea></td>
+            <td><textarea id="ct_impression_b" placeholder="How would you characterize this version overall?"></textarea></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="response-area" style="margin-top:16px;">
+      <label for="t4summary">What is your overall finding? In 3&#8211;5 sentences, describe the most significant pattern you observed across the three versions.</label>
+      <textarea id="t4summary" rows="5" placeholder="Describe the clearest or most significant pattern you noticed. What do you think explains it?"></textarea>
+    </div>
+  </section>
+
+  <hr class="section-divider">
+
+  <!-- ── REFLECTION ── -->
+  <section class="content-section" id="section-reflection">
+    <div class="task-header">
+      <div class="task-num" style="background: var(--penn-red);">R</div>
+      <div class="task-title-wrap">
+        <div class="task-title">Reflection</div>
+        <div class="task-time">~20 min — 5 questions</div>
+      </div>
+    </div>
+
+    <div class="box box-reflect">
+      <div class="box-type-label">Before You Write</div>
+      <p>These questions require you to analyze and interpret — not just describe. There are no correct answers, but strong responses will cite specific observations from your outputs, go beyond surface differences, and connect your findings to real-world implications.</p>
+    </div>
+
+    <div class="reflect-q">
+      <div class="q-num">Question 1 of 5</div>
+      <div class="q-text">What differences did you find most significant? Not just <em>what</em> was different, but why does that difference matter in a real-world context where this document might be acted on?</div>
+      <div class="q-hint">Think about what a hiring manager, supervisor, teacher, or lender might do differently based on what you observed.</div>
+      <textarea id="r1" rows="5" placeholder="Your response here..."></textarea>
+    </div>
+
+    <div class="reflect-q">
+      <div class="q-num">Question 2 of 5</div>
+      <div class="q-text">One explanation for what you observed is that AI simply mirrors patterns in its training data — which reflects society's existing biases. Another explanation is that you introduced the biases yourself by choosing how to frame the prompt. How do you weigh these two explanations?</div>
+      <div class="q-hint">Both can be true simultaneously. The interesting question is: what does each explanation imply for how to use AI responsibly?</div>
+      <textarea id="r2" rows="5" placeholder="Your response here..."></textarea>
+    </div>
+
+    <div class="reflect-q">
+      <div class="q-num">Question 3 of 5</div>
+      <div class="q-text">Imagine you work at an organization considering using AI to help draft performance reviews, loan decisions, or student assessments. Based on what you observed in this exercise, what would you want your organization to think through before implementing that?</div>
+      <div class="q-hint">Think about stakeholders, accountability, consistency, and what gets lost when framing isn't controlled.</div>
+      <textarea id="r3" rows="5" placeholder="Your response here..."></textarea>
+    </div>
+
+    <div class="reflect-q">
+      <div class="q-num">Question 4 of 5</div>
+      <div class="q-text">Did any of the AI's outputs surprise you — either by being more neutral than expected, or more different than expected? What does that tell you about your prior assumptions about AI bias?</div>
+      <textarea id="r4" rows="5" placeholder="Your response here..."></textarea>
+    </div>
+
+    <div class="reflect-q">
+      <div class="q-num">Question 5 of 5</div>
+      <div class="q-text">What would you tell a colleague who says, "I don't worry about AI bias because I always give it the same prompt"? What's missing from that reasoning?</div>
+      <div class="q-hint">Think about what "the same prompt" means when the real-world situation involves different people.</div>
+      <textarea id="r5" rows="5" placeholder="Your response here..."></textarea>
+    </div>
+  </section>
+
+  <hr class="section-divider">
+
+  <!-- ── SUBMISSION ── -->
+  <section class="content-section" id="section-submit">
+    <div class="submit-panel">
+      <h2>Submission Checklist</h2>
+      <p>Before compiling your work, confirm you have everything. Check each item, then use the button below to review and print your typed responses as a PDF.</p>
+
+      <ul class="checklist">
+        <li>
+          <input type="checkbox" id="chk1">
+          <div>
+            <label for="chk1">Task 1 — Neutral Baseline screenshot</label>
+            <span class="check-note">The full AI conversation with no demographic framing added</span>
+          </div>
+        </li>
+        <li>
+          <input type="checkbox" id="chk2">
+          <div>
+            <label for="chk2">Task 2 — Framing A screenshot</label>
+            <span class="check-note">The AI conversation with your first set of identity/context details</span>
+          </div>
+        </li>
+        <li>
+          <input type="checkbox" id="chk3">
+          <div>
+            <label for="chk3">Task 3 — Framing B screenshot</label>
+            <span class="check-note">The AI conversation with your contrasting framing details</span>
+          </div>
+        </li>
+        <li>
+          <input type="checkbox" id="chk4">
+          <div>
+            <label for="chk4">This document compiled as PDF</label>
+            <span class="check-note">All typed responses: comparison table + all 5 reflection questions</span>
+          </div>
+        </li>
+      </ul>
+
+      <button class="btn-submit" onclick="prepareSubmission()">Review &amp; Print My Responses</button>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  University of Pennsylvania &mdash; School of Liberal and Professional Studies &mdash; AI Literacy Course
+</footer>
+
+<!-- ── MODAL ── -->
+<div class="modal-overlay hidden" id="modalOverlay" onclick="closeModalOnBg(event)">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <div class="modal-header">
+      <h3 id="modalTitle">Your Responses — Exercise 3: The Framing Audit</h3>
+      <button class="modal-close" onclick="closeModal()" aria-label="Close">&times;</button>
+    </div>
+    <div class="modal-body" id="modalBody">
+      <!-- populated by JS -->
+    </div>
+    <div class="modal-footer">
+      <button class="btn-print" onclick="printSubmission()">Print / Save as PDF</button>
+      <button class="btn-cancel" onclick="closeModal()">Close</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  // ── STATE ──
+  const SECTIONS = ['background', 'task0', 'task1', 'task2', 'task3', 'task4', 'reflection'];
+  const LABELS   = ['Background', 'Choose Scenario', 'Task 1', 'Task 2', 'Task 3', 'Analysis', 'Reflection'];
+
+  let selectedScenario = null;
+
+  // ── SCENARIO SELECTION ──
+  function selectScenario(card, key) {
+    // deselect all
+    document.querySelectorAll('.scenario-card').forEach(c => c.classList.remove('selected'));
+    card.classList.add('selected');
+    selectedScenario = key;
+
+    // hide custom input if not custom
+    if (key !== 'custom') {
+      document.getElementById('customInputRow').style.display = 'none';
+    }
+
+    const confirm = document.getElementById('selectionConfirm');
+    confirm.style.display = 'block';
+    updateDots();
+  }
+
+  function showCustomInput(card) {
+    document.querySelectorAll('.scenario-card').forEach(c => c.classList.remove('selected'));
+    card.classList.add('selected');
+    document.getElementById('customInputRow').style.display = 'flex';
+    document.getElementById('customScenarioInput').focus();
+  }
+
+  function confirmCustom() {
+    const val = document.getElementById('customScenarioInput').value.trim();
+    if (!val) {
+      document.getElementById('customScenarioInput').focus();
+      return;
+    }
+    selectedScenario = 'custom:' + val;
+    const confirm = document.getElementById('selectionConfirm');
+    confirm.style.display = 'block';
+    confirm.textContent = '\u2713 Scenario selected: "' + val + '"';
+    updateDots();
+  }
+
+  // ── PROGRESS DOTS ──
+  function buildDots() {
+    const track = document.getElementById('progressTrack');
+    track.innerHTML = '';
+    SECTIONS.forEach((s, i) => {
+      const btn = document.createElement('button');
+      btn.className = 'pdot';
+      btn.title = LABELS[i];
+      btn.setAttribute('aria-label', 'Go to ' + LABELS[i]);
+      btn.addEventListener('click', () => {
+        const el = document.getElementById('section-' + s);
+        if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      });
+      track.appendChild(btn);
+    });
+    updateDots();
+  }
+
+  function updateDots() {
+    const dots = document.querySelectorAll('.pdot');
+    const scrollY = window.scrollY;
+    let activeIdx = 0;
+
+    SECTIONS.forEach((s, i) => {
+      const el = document.getElementById('section-' + s);
+      if (el && el.getBoundingClientRect().top + scrollY - 120 <= scrollY) {
+        activeIdx = i;
+      }
+    });
+
+    dots.forEach((dot, i) => {
+      dot.classList.remove('active', 'done');
+      if (i < activeIdx) dot.classList.add('done');
+      else if (i === activeIdx) dot.classList.add('active');
+    });
+  }
+
+  window.addEventListener('scroll', updateDots, { passive: true });
+  document.addEventListener('DOMContentLoaded', buildDots);
+
+  // ── COPY PROMPT ──
+  function copyPrompt(btn) {
+    const targetId = btn.getAttribute('data-target');
+    const el = document.getElementById(targetId);
+    if (!el) return;
+
+    const text = el.innerText || el.textContent;
+    navigator.clipboard.writeText(text).then(() => {
+      btn.textContent = 'Copied!';
+      btn.classList.add('copied');
+      setTimeout(() => {
+        btn.textContent = 'Copy';
+        btn.classList.remove('copied');
+      }, 2000);
+    }).catch(() => {
+      // fallback
+      const ta = document.createElement('textarea');
+      ta.value = text;
+      ta.style.position = 'fixed';
+      ta.style.opacity = '0';
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand('copy');
+      document.body.removeChild(ta);
+      btn.textContent = 'Copied!';
+      btn.classList.add('copied');
+      setTimeout(() => {
+        btn.textContent = 'Copy';
+        btn.classList.remove('copied');
+      }, 2000);
+    });
+  }
+
+  // ── ESCAPE HTML ──
+  function escHtml(str) {
+    if (!str) return '<em style="color:var(--text-faint)">No response entered.</em>';
+    return str
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/\n/g, '<br>');
+  }
+
+  // ── COMPARISON TABLE ROWS ──
+  const TABLE_ROWS = [
+    { label: 'Tone / register',                      ids: ['ct_tone_base',        'ct_tone_a',        'ct_tone_b']        },
+    { label: 'Length',                               ids: ['ct_length_base',      'ct_length_a',      'ct_length_b']      },
+    { label: 'Specific word choices that stood out', ids: ['ct_words_base',       'ct_words_a',       'ct_words_b']       },
+    { label: 'What was emphasized or highlighted',   ids: ['ct_emphasis_base',    'ct_emphasis_a',    'ct_emphasis_b']    },
+    { label: 'What was left out or downplayed',      ids: ['ct_omitted_base',     'ct_omitted_a',     'ct_omitted_b']     },
+    { label: 'Assumptions embedded',                 ids: ['ct_assumptions_base', 'ct_assumptions_a', 'ct_assumptions_b'] },
+    { label: 'Overall impression',                   ids: ['ct_impression_base',  'ct_impression_a',  'ct_impression_b']  },
+  ];
+
+  // ── PREPARE SUBMISSION ──
+  function prepareSubmission() {
+    const get = id => {
+      const el = document.getElementById(id);
+      return el ? el.value.trim() : '';
+    };
+
+    let html = '<p>Review your typed responses below. When ready, click <strong>Print / Save as PDF</strong> to export. Attach your three screenshots separately.</p>';
+
+    // --- Section: Scenario ---
+    html += '<div class="modal-answer"><div class="label">Chosen Scenario</div>';
+    let scenLabel = selectedScenario || 'Not selected';
+    if (scenLabel.startsWith('custom:')) scenLabel = 'Custom: ' + scenLabel.slice(7);
+    html += '<div class="value">' + escHtml(scenLabel) + '</div></div>';
+
+    // --- Task 1 ---
+    html += '<div class="modal-answer"><div class="label">Task 1 — Neutral Baseline: Summary</div><div class="value">' + escHtml(get('t1q1')) + '</div></div>';
+    html += '<div class="modal-answer"><div class="label">Task 1 — Default Assumptions Observed</div><div class="value">' + escHtml(get('t1q2')) + '</div></div>';
+
+    // --- Task 2 ---
+    html += '<div class="modal-answer"><div class="label">Task 2 — Framing A: Prompt Used</div><div class="value">' + escHtml(get('t2q1')) + '</div></div>';
+    html += '<div class="modal-answer"><div class="label">Task 2 — Framing A: Summary</div><div class="value">' + escHtml(get('t2q2')) + '</div></div>';
+    html += '<div class="modal-answer"><div class="label">Task 2 — Framing A: Comparison to Baseline</div><div class="value">' + escHtml(get('t2q3')) + '</div></div>';
+
+    // --- Task 3 ---
+    html += '<div class="modal-answer"><div class="label">Task 3 — Framing B: Prompt Used</div><div class="value">' + escHtml(get('t3q1')) + '</div></div>';
+    html += '<div class="modal-answer"><div class="label">Task 3 — Framing B: Summary</div><div class="value">' + escHtml(get('t3q2')) + '</div></div>';
+    html += '<div class="modal-answer"><div class="label">Task 3 — Framing B: Comparison</div><div class="value">' + escHtml(get('t3q3')) + '</div></div>';
+
+    // --- Comparison Table ---
+    html += '<div class="modal-answer"><div class="label">Comparison Table</div><div class="value" style="padding:0; background:transparent;">';
+    html += '<table style="width:100%; border-collapse:collapse; font-size:.82rem;">';
+    html += '<tr style="background:var(--penn-blue); color:#fff;"><th style="padding:7px 10px; text-align:left;">Dimension</th><th style="padding:7px 10px; text-align:left;">Baseline</th><th style="padding:7px 10px; text-align:left;">Framing A</th><th style="padding:7px 10px; text-align:left;">Framing B</th></tr>';
+    TABLE_ROWS.forEach((row, idx) => {
+      const bg = idx % 2 === 0 ? 'var(--surface)' : 'var(--surface-2)';
+      html += '<tr style="background:' + bg + ';">';
+      html += '<td style="padding:7px 10px; font-weight:600; border-bottom:1px solid var(--border);">' + escHtml(row.label) + '</td>';
+      row.ids.forEach(id => {
+        html += '<td style="padding:7px 10px; border-bottom:1px solid var(--border); vertical-align:top;">' + escHtml(get(id)) + '</td>';
+      });
+      html += '</tr>';
+    });
+    html += '</table></div></div>';
+
+    html += '<div class="modal-answer"><div class="label">Task 4 — Overall Finding</div><div class="value">' + escHtml(get('t4summary')) + '</div></div>';
+
+    // --- Reflection ---
+    const rQuestions = [
+      'Q1 — Most significant difference and why it matters',
+      'Q2 — Training data bias vs. user framing: how do you weigh these?',
+      'Q3 — Organizational considerations before deploying AI for decisions',
+      'Q4 — What surprised you, and what does that reveal about your assumptions?',
+      'Q5 — What would you tell a colleague who isn\'t worried about AI bias?',
+    ];
+    rQuestions.forEach((q, i) => {
+      html += '<div class="modal-answer"><div class="label">Reflection ' + q + '</div><div class="value">' + escHtml(get('r' + (i + 1))) + '</div></div>';
+    });
+
+    document.getElementById('modalBody').innerHTML = html;
+    document.getElementById('modalOverlay').classList.remove('hidden');
+    document.body.style.overflow = 'hidden';
+  }
+
+  // ── MODAL CONTROLS ──
+  function closeModal() {
+    document.getElementById('modalOverlay').classList.add('hidden');
+    document.body.style.overflow = '';
+  }
+
+  function closeModalOnBg(event) {
+    if (event.target === document.getElementById('modalOverlay')) {
+      closeModal();
+    }
+  }
+
+  function printSubmission() {
+    window.print();
+  }
+
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') closeModal();
+  });
+</script>
+
+</body>
+</html>

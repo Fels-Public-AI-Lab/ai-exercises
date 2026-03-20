@@ -1,0 +1,1120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Exercise 2: The Hallucination Hunt — Penn LPS AI Literacy</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;600;700&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #f5f6f8;
+      --surface: #ffffff;
+      --surface-2: #f0f2f6;
+      --border: #e3e6ec;
+      --border-strong: #c8cdd8;
+      --text: #111827;
+      --text-mid: #374151;
+      --text-muted: #6b7280;
+      --text-faint: #9ca3af;
+      --penn-blue: #011F5B;
+      --penn-blue-mid: #0d2e7a;
+      --penn-blue-tint: #edf0f8;
+      --penn-red: #990000;
+      --penn-red-tint: #fef5f5;
+      --green: #15803d;
+      --green-tint: #f0fdf4;
+      --amber: #92400e;
+      --amber-tint: #fffbeb;
+      --indigo: #4338ca;
+      --indigo-tint: #f5f3ff;
+      --sans: 'Inter', system-ui, -apple-system, sans-serif;
+      --mono: 'IBM Plex Mono', 'Courier New', monospace;
+      --radius: 8px;
+      --radius-lg: 14px;
+      --shadow: 0 1px 3px rgba(0,0,0,.06), 0 1px 2px rgba(0,0,0,.07);
+      --shadow-md: 0 4px 8px rgba(0,0,0,.06), 0 2px 4px rgba(0,0,0,.07);
+    }
+
+    html { scroll-behavior: smooth; font-size: 15px; }
+    body { font-family: var(--sans); color: var(--text); background: var(--bg); line-height: 1.65; }
+
+    /* ── TOPBAR ── */
+    .topbar { position: sticky; top: 0; z-index: 200; background: var(--penn-blue); color: #fff; height: 52px; padding: 0 28px; display: flex; align-items: center; gap: 16px; box-shadow: 0 2px 8px rgba(0,0,0,.22); }
+    .topbar-brand { font-size: .78rem; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: rgba(255,255,255,.65); white-space: nowrap; }
+    .topbar-sep { color: rgba(255,255,255,.25); }
+    .topbar-nav { display: flex; gap: 4px; }
+    .tnav { padding: 4px 12px; border-radius: 4px; font-size: .8rem; font-weight: 500; color: rgba(255,255,255,.55); text-decoration: none; transition: background .15s, color .15s; }
+    .tnav:hover { background: rgba(255,255,255,.1); color: #fff; }
+    .tnav.active { background: var(--penn-red); color: #fff; }
+    .topbar-spacer { flex: 1; }
+    .progress-track { display: flex; gap: 6px; align-items: center; }
+    .pdot { width: 9px; height: 9px; border-radius: 50%; background: rgba(255,255,255,.2); border: none; cursor: pointer; padding: 0; transition: background .2s, transform .2s; }
+    .pdot.active { background: rgba(255,255,255,.65); }
+    .pdot.done { background: #4ade80; transform: scale(1.15); }
+
+    /* ── HERO ── */
+    .hero { background: linear-gradient(140deg, var(--penn-blue) 0%, #0d2e7a 55%, #1a4a9e 100%); color: #fff; padding: 52px 40px 44px; position: relative; overflow: hidden; }
+    .hero::after { content: ''; position: absolute; bottom: -80px; right: -60px; width: 340px; height: 340px; border-radius: 50%; background: radial-gradient(circle, rgba(255,255,255,.04) 0%, transparent 70%); }
+    .hero-inner { max-width: 840px; margin: 0 auto; display: flex; gap: 48px; align-items: flex-start; position: relative; z-index: 1; }
+    .hero-left { flex: 1.1; }
+    .hero-eyebrow { font-size: .72rem; font-weight: 600; letter-spacing: .12em; text-transform: uppercase; color: rgba(255,255,255,.5); margin-bottom: 10px; }
+    .hero h1 { font-size: 2.3rem; font-weight: 700; line-height: 1.15; margin-bottom: 8px; letter-spacing: -.02em; }
+    .hero-sub { font-size: 1.05rem; color: rgba(255,255,255,.75); margin-bottom: 22px; max-width: 380px; line-height: 1.5; }
+    .hero-tags { display: flex; flex-wrap: wrap; gap: 8px; }
+    .hero-tag { background: rgba(255,255,255,.1); border: 1px solid rgba(255,255,255,.15); border-radius: 20px; padding: 4px 13px; font-size: .8rem; color: rgba(255,255,255,.8); }
+    .hero-right { flex: 1; min-width: 240px; }
+    .obj-box { background: rgba(255,255,255,.07); border: 1px solid rgba(255,255,255,.12); border-radius: var(--radius-lg); padding: 20px 22px; }
+    .obj-label { font-size: .68rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: rgba(255,255,255,.4); margin-bottom: 12px; }
+    .obj-list { list-style: none; counter-reset: obj; }
+    .obj-list li { counter-increment: obj; font-size: .875rem; color: rgba(255,255,255,.82); line-height: 1.5; padding: 6px 0 6px 28px; position: relative; border-bottom: 1px solid rgba(255,255,255,.07); }
+    .obj-list li:last-child { border-bottom: none; }
+    .obj-list li::before { content: counter(obj); position: absolute; left: 0; top: 8px; font-size: .68rem; font-weight: 700; color: var(--penn-red); background: rgba(153,0,0,.2); width: 18px; height: 18px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-family: var(--mono); }
+
+    /* ── MAIN ── */
+    .main { max-width: 840px; margin: 0 auto; padding: 36px 24px 80px; }
+
+    /* ── HOW TO USE ── */
+    .howto { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 24px 26px; margin-bottom: 32px; box-shadow: var(--shadow); }
+    .howto h2 { font-size: 1rem; font-weight: 700; margin-bottom: 16px; color: var(--penn-blue); }
+    .howto-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 14px; }
+    .howto-item { display: flex; gap: 10px; font-size: .85rem; line-height: 1.55; color: var(--text-mid); }
+    .howto-icon { font-size: 1.1rem; flex-shrink: 0; margin-top: 1px; }
+    .howto-tool { font-size: .83rem; color: var(--text-muted); background: var(--bg); border-radius: 6px; padding: 10px 14px; border: 1px solid var(--border); }
+
+    /* ── SECTIONS ── */
+    .content-section { margin-bottom: 36px; }
+    .task-header { display: flex; align-items: center; gap: 14px; margin-bottom: 16px; }
+    .task-num { width: 42px; height: 42px; border-radius: 50%; background: var(--penn-blue); color: #fff; font-size: 1.15rem; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-family: var(--mono); }
+    .task-title-wrap { flex: 1; }
+    .task-title { font-size: 1.25rem; font-weight: 700; color: var(--text); margin-bottom: 1px; }
+    .task-time { font-size: .73rem; color: var(--text-faint); font-family: var(--mono); }
+    .section-title { font-size: 1.05rem; font-weight: 700; color: var(--penn-blue); margin-bottom: 12px; padding-bottom: 8px; border-bottom: 2px solid var(--penn-blue-tint); }
+
+    /* ── PROSE CARD ── */
+    .prose-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 22px 24px; box-shadow: var(--shadow); }
+    .prose-card p { font-size: .92rem; color: var(--text-mid); margin-bottom: 12px; line-height: 1.72; }
+    .prose-card p:last-child { margin-bottom: 0; }
+    .prose-card strong { color: var(--text); }
+
+    /* ── BOXES ── */
+    .box { border-radius: var(--radius); padding: 16px 18px; margin-bottom: 14px; border-left: 4px solid; }
+    .box p, .box li { font-size: .88rem; line-height: 1.6; color: var(--text-mid); }
+    .box ul, .box ol { padding-left: 18px; margin-top: 6px; }
+    .box ul li, .box ol li { margin-bottom: 4px; }
+    .box-read { border-color: var(--text-faint); background: var(--surface-2); }
+    .box-action { border-color: var(--penn-blue); background: var(--penn-blue-tint); }
+    .box-action .box-type-label { color: var(--penn-blue); }
+    .box-reflect { border-color: var(--penn-red); background: var(--penn-red-tint); }
+    .box-reflect .box-type-label { color: var(--penn-red); }
+    .box-evidence { border-color: var(--indigo); background: var(--indigo-tint); }
+    .box-evidence .box-type-label { color: var(--indigo); }
+    .box-submit { border-color: var(--green); background: var(--green-tint); }
+    .box-submit .box-type-label { color: var(--green); }
+    .box-type-label { font-size: .67rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; margin-bottom: 6px; opacity: .75; }
+
+    /* ── PROMPT TERMINAL ── */
+    .prompt-terminal { background: #1e2533; border-radius: var(--radius); overflow: hidden; margin-bottom: 14px; }
+    .terminal-bar { background: #141921; padding: 10px 16px; display: flex; align-items: center; gap: 8px; }
+    .dots { display: flex; gap: 5px; }
+    .dot { width: 10px; height: 10px; border-radius: 50%; }
+    .dot.red { background: #ff5f57; }
+    .dot.yellow { background: #febc2e; }
+    .dot.green { background: #28c840; }
+    .terminal-label { font-family: var(--mono); font-size: .7rem; color: rgba(255,255,255,.3); margin-left: 6px; }
+    .copy-btn { margin-left: auto; background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.12); border-radius: 4px; color: rgba(255,255,255,.6); font-family: var(--mono); font-size: .72rem; padding: 4px 10px; cursor: pointer; transition: background .15s; }
+    .copy-btn:hover { background: rgba(255,255,255,.15); }
+    .copy-btn.copied { background: rgba(74,222,128,.15); color: #4ade80; border-color: rgba(74,222,128,.25); }
+    .prompt-body { padding: 18px 20px; font-family: var(--mono); font-size: .84rem; color: #e2e8f0; line-height: 1.8; }
+    .prompt-body code { display: block; white-space: pre-wrap; }
+    .ph { color: #fbbf24; font-style: italic; }
+    .comment-line { color: #4b5775; }
+
+    /* ── RESPONSE AREAS ── */
+    .response-area { margin-bottom: 16px; }
+    .response-area label { display: block; font-size: .82rem; font-weight: 600; color: var(--text-muted); margin-bottom: 5px; }
+    textarea { width: 100%; padding: 11px 13px; font-family: var(--sans); font-size: .88rem; line-height: 1.65; color: var(--text); background: var(--surface); border: 1.5px solid var(--border); border-radius: var(--radius); resize: vertical; transition: border-color .15s, box-shadow .15s; }
+    textarea:focus { outline: none; border-color: var(--penn-blue); box-shadow: 0 0 0 3px rgba(1,31,91,.09); }
+
+    /* ── FACT CHECK TABLE ── */
+    .fc-table { width: 100%; border-collapse: collapse; background: var(--surface); border-radius: var(--radius); overflow: hidden; box-shadow: var(--shadow); margin-bottom: 14px; font-size: .85rem; }
+    .fc-table th { background: var(--penn-blue); color: #fff; padding: 10px 12px; text-align: left; font-size: .75rem; font-weight: 600; letter-spacing: .04em; }
+    .fc-table td { padding: 10px 12px; border-bottom: 1px solid var(--border); vertical-align: top; }
+    .fc-table tr:last-child td { border-bottom: none; }
+    .fc-table tr:nth-child(even) td { background: var(--bg); }
+    .fc-table textarea { min-height: 60px; border: 1px solid var(--border); font-size: .82rem; padding: 6px 8px; }
+    .fc-table select { width: 100%; padding: 6px 8px; border: 1px solid var(--border); border-radius: 4px; font-family: var(--sans); font-size: .82rem; background: var(--surface); }
+    .fc-table select:focus { outline: none; border-color: var(--penn-blue); }
+    .verdict-accurate { color: var(--green); font-weight: 600; }
+    .verdict-partial { color: var(--amber); font-weight: 600; }
+    .verdict-wrong { color: var(--penn-red); font-weight: 600; }
+    .verdict-unknown { color: var(--text-muted); font-weight: 600; }
+
+    /* ── REFLECTION QUESTIONS ── */
+    .reflect-q { background: var(--surface); border: 1px solid #fde68a; border-left: 4px solid var(--penn-red); border-radius: var(--radius); padding: 18px 20px; margin-bottom: 16px; }
+    .q-num { font-family: var(--mono); font-size: .68rem; color: var(--penn-red); font-weight: 700; letter-spacing: .08em; text-transform: uppercase; margin-bottom: 7px; }
+    .q-text { font-size: .95rem; font-weight: 600; color: var(--text); margin-bottom: 6px; line-height: 1.45; }
+    .q-hint { font-size: .82rem; color: var(--text-muted); font-style: italic; margin-bottom: 10px; line-height: 1.5; }
+
+    /* ── DOMAIN GRID ── */
+    .domain-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(175px, 1fr)); gap: 10px; margin: 14px 0; }
+    .domain-card { border: 1.5px solid var(--border); border-radius: var(--radius); padding: 14px; cursor: pointer; background: var(--surface); transition: border-color .15s, box-shadow .15s, background .15s; user-select: none; }
+    .domain-card:hover { border-color: var(--penn-blue); background: var(--penn-blue-tint); }
+    .domain-card.selected { border-color: var(--penn-blue); background: var(--penn-blue-tint); box-shadow: 0 0 0 3px rgba(1,31,91,.12); }
+    .domain-emoji { font-size: 1.5rem; margin-bottom: 6px; }
+    .domain-name { font-size: .85rem; font-weight: 600; color: var(--text); }
+    .domain-desc { font-size: .76rem; color: var(--text-muted); margin-top: 3px; line-height: 1.4; }
+    .selection-confirm { background: var(--green-tint); border: 1px solid #86efac; border-radius: var(--radius); padding: 10px 14px; font-size: .85rem; color: var(--green); margin-top: 8px; display: none; }
+    .custom-row { display: flex; gap: 8px; margin-top: 10px; align-items: center; display: none; }
+    .custom-row input { flex: 1; padding: 8px 12px; border: 1.5px solid var(--border); border-radius: var(--radius); font-size: .88rem; font-family: var(--sans); color: var(--text); }
+    .custom-row input:focus { outline: none; border-color: var(--penn-blue); }
+    .btn-sm { padding: 8px 16px; background: var(--penn-blue); color: #fff; border: none; border-radius: var(--radius); font-size: .82rem; font-weight: 600; cursor: pointer; white-space: nowrap; }
+    .btn-sm:hover { background: var(--penn-blue-mid); }
+
+    /* ── SUBMIT PANEL ── */
+    .submit-panel { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 28px 32px; box-shadow: var(--shadow-md); margin-top: 8px; }
+    .submit-panel h2 { font-size: 1.1rem; font-weight: 700; margin-bottom: 8px; color: var(--penn-blue); }
+    .submit-panel > p { font-size: .88rem; color: var(--text-muted); margin-bottom: 20px; line-height: 1.6; }
+    .checklist { list-style: none; margin-bottom: 24px; }
+    .checklist li { display: flex; align-items: flex-start; gap: 10px; padding: 9px 0; border-bottom: 1px solid var(--border); font-size: .88rem; color: var(--text-mid); }
+    .checklist li:last-child { border-bottom: none; }
+    .checklist input[type="checkbox"] { width: 17px; height: 17px; flex-shrink: 0; margin-top: 2px; accent-color: var(--penn-blue); cursor: pointer; }
+    .check-note { font-size: .78rem; color: var(--text-faint); display: block; margin-top: 2px; }
+    .btn-submit { padding: 13px 32px; background: var(--penn-blue); color: #fff; border: none; border-radius: var(--radius); font-size: .95rem; font-weight: 700; cursor: pointer; letter-spacing: .01em; transition: background .15s, transform .1s; display: block; width: 100%; }
+    .btn-submit:hover { background: var(--penn-blue-mid); }
+    .btn-submit:active { transform: scale(.99); }
+
+    /* ── DIVIDER ── */
+    .section-divider { border: none; border-top: 1px solid var(--border); margin: 28px 0; }
+
+    /* ── FOOTER ── */
+    footer { text-align: center; padding: 24px; font-size: .78rem; color: var(--text-faint); border-top: 1px solid var(--border); max-width: 840px; margin: 0 auto; }
+
+    /* ── MODAL ── */
+    .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,.5); z-index: 500; display: flex; align-items: center; justify-content: center; padding: 24px; }
+    .modal-overlay.hidden { display: none; }
+    .modal { background: var(--surface); border-radius: var(--radius-lg); width: 100%; max-width: 620px; max-height: 80vh; display: flex; flex-direction: column; box-shadow: 0 20px 40px rgba(0,0,0,.2); }
+    .modal-header { padding: 20px 24px 16px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
+    .modal-header h3 { font-size: 1rem; font-weight: 700; }
+    .modal-close { background: none; border: none; font-size: 1.2rem; cursor: pointer; color: var(--text-muted); padding: 4px 8px; border-radius: 4px; }
+    .modal-close:hover { background: var(--bg); }
+    .modal-body { padding: 20px 24px; overflow-y: auto; flex: 1; }
+    .modal-body p { font-size: .88rem; color: var(--text-muted); margin-bottom: 16px; line-height: 1.6; }
+    .modal-answer { margin-bottom: 18px; }
+    .modal-answer .label { font-size: .72rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--penn-red); margin-bottom: 4px; }
+    .modal-answer .value { font-size: .88rem; color: var(--text); background: var(--bg); padding: 10px 12px; border-radius: 6px; line-height: 1.6; white-space: pre-wrap; }
+    .modal-footer { padding: 16px 24px; border-top: 1px solid var(--border); display: flex; gap: 10px; }
+    .btn-print { flex: 1; padding: 10px; background: var(--penn-blue); color: #fff; border: none; border-radius: var(--radius); font-size: .88rem; font-weight: 600; cursor: pointer; }
+    .btn-print:hover { background: var(--penn-blue-mid); }
+    .btn-cancel { padding: 10px 18px; background: var(--bg); color: var(--text-muted); border: 1px solid var(--border); border-radius: var(--radius); font-size: .88rem; cursor: pointer; }
+
+    /* ── ROW NUMBER BADGE ── */
+    .row-badge { display: inline-flex; align-items: center; justify-content: center; width: 22px; height: 22px; background: var(--penn-blue); color: #fff; border-radius: 50%; font-size: .72rem; font-weight: 700; font-family: var(--mono); flex-shrink: 0; }
+
+    /* ── PRINT ── */
+    @media print {
+      .topbar, .howto, .hero-tags, .copy-btn, .domain-grid, .custom-row, .prompt-terminal, .box-evidence, .btn-submit, .modal-footer, .checklist input { display: none; }
+      body { background: #fff; font-size: 12pt; }
+      .main { padding: 0; max-width: 100%; }
+    }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 700px) {
+      .hero { padding: 32px 20px 28px; }
+      .hero-inner { flex-direction: column; gap: 24px; }
+      .hero h1 { font-size: 1.8rem; }
+      .hero-right { display: none; }
+      .main { padding: 24px 16px 60px; }
+      .howto-grid { grid-template-columns: 1fr; }
+      .domain-grid { grid-template-columns: 1fr 1fr; }
+      .topbar-nav { display: none; }
+      .fc-table { font-size: .78rem; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ── TOPBAR ── -->
+<nav class="topbar" role="navigation" aria-label="Exercise navigation">
+  <span style="display:flex;align-items:center;gap:9px;">
+    <span style="width:28px;height:28px;border-radius:50%;border:1.5px solid rgba(255,255,255,.35);display:flex;align-items:center;justify-content:center;font-size:.75rem;font-weight:700;color:#fff;font-family:var(--mono);flex-shrink:0;">P</span>
+    <span style="display:flex;flex-direction:column;line-height:1.25;">
+      <span style="font-size:.72rem;font-weight:700;letter-spacing:.07em;color:#fff;text-transform:uppercase;">Penn LPS</span>
+      <span style="font-size:.6rem;letter-spacing:.1em;color:rgba(255,255,255,.5);text-transform:uppercase;">Online</span>
+    </span>
+  </span>
+  <div class="topbar-nav">
+    <a href="../prompt-engineering-lab/" class="tnav">Ex 1</a>
+    <span class="tnav active" aria-current="page">Ex 2</span>
+    <a href="../framing-audit/" class="tnav">Ex 3</a>
+    <a href="../ai-research-partner/" class="tnav">Ex 4</a>
+  </div>
+  <div class="topbar-spacer"></div>
+  <div class="progress-track" id="progressTrack" aria-label="Exercise progress"></div>
+</nav>
+
+<!-- ── HERO ── -->
+<header class="hero" role="banner">
+  <div class="hero-inner">
+    <div class="hero-left">
+      <div class="hero-eyebrow">Exercise 2 of 4 &nbsp;·&nbsp; AI Literacy Series</div>
+      <h1>The Hallucination<br>Hunt</h1>
+      <p class="hero-sub">Learning to verify what AI tells you</p>
+      <div class="hero-tags">
+        <span class="hero-tag">⏱ ~60 minutes</span>
+        <span class="hero-tag">🔬 Hands-on</span>
+        <span class="hero-tag">📸 Screenshots required</span>
+        <span class="hero-tag">✍️ Typed reflections</span>
+        <span class="hero-tag">🛠️ Any AI tool</span>
+      </div>
+    </div>
+    <div class="hero-right">
+      <div class="obj-box">
+        <div class="obj-label">Learning Objectives</div>
+        <ol class="obj-list">
+          <li>Understand why AI models generate inaccurate or fabricated information</li>
+          <li>Practice systematic fact-checking of AI-generated content</li>
+          <li>Identify patterns in the types of errors AI tends to make</li>
+          <li>Develop habits for responsibly using AI on topics you don't know well</li>
+        </ol>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- ── MAIN ── -->
+<main class="main" role="main">
+
+  <!-- HOW TO USE -->
+  <div class="howto">
+    <h2>How to Use This Exercise</h2>
+    <div class="howto-grid">
+      <div class="howto-item">
+        <span class="howto-icon">📋</span>
+        <span>Work through each section in order. Read all instructions before opening your AI tool.</span>
+      </div>
+      <div class="howto-item">
+        <span class="howto-icon">📸</span>
+        <span>Take screenshots as instructed — you'll need two for your submission.</span>
+      </div>
+      <div class="howto-item">
+        <span class="howto-icon">✍️</span>
+        <span>Type your responses directly into the text areas. Your work saves in the browser as you go.</span>
+      </div>
+      <div class="howto-item">
+        <span class="howto-icon">📄</span>
+        <span>When finished, click "Compile Submission" to generate a printable summary to save as PDF.</span>
+      </div>
+    </div>
+    <div class="howto-tool">
+      <strong>Tool-agnostic:</strong> Use ChatGPT, Claude, Gemini, Copilot, or any other LLM you have access to. Open a fresh conversation for each task prompt.
+    </div>
+  </div>
+
+  <!-- ── SECTION: BACKGROUND ── -->
+  <section class="content-section" data-section="background" id="background">
+    <div class="section-title">Background: Why AI Hallucinates</div>
+    <div class="prose-card">
+      <p>Large language models generate text by predicting what words should come next based on patterns in their training data. They do not "look things up" the way a search engine does — they produce plausible-sounding text based on what has appeared in similar contexts. This means they can be confidently, fluently wrong.</p>
+      <p>This phenomenon is called <strong>hallucination</strong> — when an AI produces information that sounds convincing but is fabricated, outdated, distorted, or just incorrect. It's not lying in the human sense; the model has no intent. It simply generates what fits the pattern, whether or not it corresponds to reality. Statistics, names, dates, citations, and specific details are particularly prone to hallucination.</p>
+      <p>The most important skill for using AI responsibly is not knowing what it can do — it's knowing when to trust it and when to verify. This exercise is designed to build exactly that instinct. You'll generate a substantive AI output on a topic you personally know well, then systematically fact-check what it tells you. By the end, you'll have a much clearer sense of where AI tends to go wrong and how to respond when it does.</p>
+    </div>
+  </section>
+
+  <hr class="section-divider" />
+
+  <!-- ── SECTION 0: CHOOSE YOUR DOMAIN ── -->
+  <section class="content-section" data-section="task0" id="task0">
+    <div class="task-header">
+      <div class="task-num">0</div>
+      <div class="task-title-wrap">
+        <div class="task-title">Choose Your Domain</div>
+        <div class="task-time">~5 min</div>
+      </div>
+    </div>
+
+    <div class="box box-action">
+      <div class="box-type-label">Instructions</div>
+      <p>For this exercise to work, you need to choose a domain where <strong>you</strong> have real knowledge — not something you're just curious about. This could be your profession, your undergraduate major, your hometown, a hobby you've practiced for years, or any area of life where you could catch the AI if it got something wrong.</p>
+    </div>
+
+    <div class="domain-grid" id="domainGrid" role="group" aria-label="Select your domain">
+      <div class="domain-card" onclick="selectDomain(this, 'My City or Region')" tabindex="0" role="button" aria-pressed="false">
+        <div class="domain-emoji">🏙️</div>
+        <div class="domain-name">My City or Region</div>
+        <div class="domain-desc">Local history, geography, institutions, events</div>
+      </div>
+      <div class="domain-card" onclick="selectDomain(this, 'My Undergraduate Major')" tabindex="0" role="button" aria-pressed="false">
+        <div class="domain-emoji">🎓</div>
+        <div class="domain-name">My Undergraduate Major</div>
+        <div class="domain-desc">The field I studied before this degree</div>
+      </div>
+      <div class="domain-card" onclick="selectDomain(this, 'My Profession or Industry')" tabindex="0" role="button" aria-pressed="false">
+        <div class="domain-emoji">💼</div>
+        <div class="domain-name">My Profession or Industry</div>
+        <div class="domain-desc">Work I've done for at least a few years</div>
+      </div>
+      <div class="domain-card" onclick="selectDomain(this, 'A Serious Hobby')" tabindex="0" role="button" aria-pressed="false">
+        <div class="domain-emoji">🎵</div>
+        <div class="domain-name">A Serious Hobby</div>
+        <div class="domain-desc">Something I've practiced or studied for years</div>
+      </div>
+      <div class="domain-card" onclick="selectDomain(this, 'A Health Topic I Know Well')" tabindex="0" role="button" aria-pressed="false">
+        <div class="domain-emoji">🏥</div>
+        <div class="domain-name">A Health Topic I Know Well</div>
+        <div class="domain-desc">A condition, treatment, or healthcare area I've researched deeply</div>
+      </div>
+      <div class="domain-card" onclick="selectDomain(this, 'Legal or Policy Area')" tabindex="0" role="button" aria-pressed="false">
+        <div class="domain-emoji">⚖️</div>
+        <div class="domain-name">Legal or Policy Area</div>
+        <div class="domain-desc">A specific area of law or policy I've worked in or studied</div>
+      </div>
+      <div class="domain-card" onclick="selectDomain(this, 'A Historical Period or Event')" tabindex="0" role="button" aria-pressed="false">
+        <div class="domain-emoji">🏛️</div>
+        <div class="domain-name">A Historical Period or Event</div>
+        <div class="domain-desc">Something I've studied in depth</div>
+      </div>
+      <div class="domain-card" onclick="selectDomain(this, 'A Technical or Scientific Field')" tabindex="0" role="button" aria-pressed="false">
+        <div class="domain-emoji">🔬</div>
+        <div class="domain-name">A Technical or Scientific Field</div>
+        <div class="domain-desc">A STEM area from my education or work</div>
+      </div>
+      <div class="domain-card" onclick="showCustomInput(this)" tabindex="0" role="button" aria-pressed="false">
+        <div class="domain-emoji">✏️</div>
+        <div class="domain-name">My Own Domain</div>
+        <div class="domain-desc">Enter something specific</div>
+      </div>
+    </div>
+
+    <div class="custom-row" id="customRow">
+      <input type="text" id="customDomainInput" placeholder="Describe your domain (e.g., Supply chain logistics in healthcare)" aria-label="Custom domain description" />
+      <button class="btn-sm" onclick="confirmCustom()">Confirm</button>
+    </div>
+
+    <div class="selection-confirm" id="selectionConfirm" role="status" aria-live="polite"></div>
+  </section>
+
+  <hr class="section-divider" />
+
+  <!-- ── TASK 1: GENERATE THE OUTPUT ── -->
+  <section class="content-section" data-section="task1" id="task1">
+    <div class="task-header">
+      <div class="task-num">1</div>
+      <div class="task-title-wrap">
+        <div class="task-title">Generate the Output</div>
+        <div class="task-time">~10 min</div>
+      </div>
+    </div>
+
+    <div class="box box-action">
+      <div class="box-type-label">Action</div>
+      <p>Open a fresh conversation in your AI tool. Use the prompt template below to get a substantive output about something specific within your domain. You want detailed, specific content — the kind where inaccuracies would be detectable.</p>
+    </div>
+
+    <div class="prompt-terminal" role="region" aria-label="Prompt template for Task 1">
+      <div class="terminal-bar">
+        <div class="dots">
+          <div class="dot red"></div>
+          <div class="dot yellow"></div>
+          <div class="dot green"></div>
+        </div>
+        <span class="terminal-label">Prompt Template — Task 1</span>
+        <button class="copy-btn" onclick="copyPrompt(this, 'prompt1')" aria-label="Copy prompt to clipboard">Copy</button>
+      </div>
+      <div class="prompt-body">
+        <code id="prompt1">I'd like you to write a detailed overview of <span class="ph">[SPECIFIC TOPIC WITHIN YOUR DOMAIN — e.g., "the history of zoning laws in Philadelphia", "how cognitive behavioral therapy works for anxiety disorders", "the lifecycle of a federal grant application"]</span>.
+
+Please include:
+- Key facts, figures, dates, or statistics where relevant
+- Specific names of people, organizations, laws, or programs
+- How this topic has evolved or changed over time
+- Any current debates, challenges, or open questions
+
+Write approximately 400–500 words. Be as specific and detailed as possible.</code>
+      </div>
+    </div>
+
+    <div class="box box-read">
+      <div class="box-type-label">After Running</div>
+      <p>Take a full screenshot of the AI's output (you'll submit this). Then paste or type the full response into the text area below so you can work with it in the fact-check table.</p>
+    </div>
+
+    <div class="response-area">
+      <label for="task1-response">Paste or type the AI's full response here (you'll use this to complete the fact-check table):</label>
+      <textarea id="task1-response" rows="14" placeholder="Paste the AI's full response here…" aria-label="AI response from Task 1"></textarea>
+    </div>
+  </section>
+
+  <hr class="section-divider" />
+
+  <!-- ── TASK 2: EXTRACT AND CLASSIFY CLAIMS ── -->
+  <section class="content-section" data-section="task2" id="task2">
+    <div class="task-header">
+      <div class="task-num">2</div>
+      <div class="task-title-wrap">
+        <div class="task-title">Extract and Classify Claims</div>
+        <div class="task-time">~20 min</div>
+      </div>
+    </div>
+
+    <div class="box box-read">
+      <div class="box-type-label">Why This Matters</div>
+      <p>Not every sentence in an AI output is a factual claim. Some statements are general descriptions, logical inferences, or hedged opinions. For this task, focus on <strong>specific, verifiable claims</strong> — numbers, dates, names, attributions, program descriptions, historical events. These are where hallucinations tend to hide.</p>
+    </div>
+
+    <div class="box box-action">
+      <div class="box-type-label">Action</div>
+      <p>Read through the AI's response and identify at least <strong>5 specific factual claims</strong> that could in principle be verified. For each one, enter it in the table below, then record how confident you are it's accurate (before verifying), how you verified it, and what you found.</p>
+    </div>
+
+    <div style="overflow-x: auto;">
+      <table class="fc-table" aria-label="Fact-check table">
+        <thead>
+          <tr>
+            <th style="width: 28px;">#</th>
+            <th style="min-width: 200px;">Claim from AI</th>
+            <th style="min-width: 130px;">Confidence before checking</th>
+            <th style="min-width: 160px;">How did you check it?</th>
+            <th style="min-width: 140px;">Verdict</th>
+            <th style="min-width: 160px;">Notes on the error (if any)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- Row 1 -->
+          <tr>
+            <td><span class="row-badge">1</span></td>
+            <td><textarea id="fc-claim-1" rows="3" placeholder="Paste the specific claim from the AI's response…" aria-label="Claim 1 from AI"></textarea></td>
+            <td>
+              <select id="fc-confidence-1" aria-label="Confidence level for claim 1">
+                <option value="">— Select —</option>
+                <option value="High">High</option>
+                <option value="Medium">Medium</option>
+                <option value="Low">Low</option>
+                <option value="Unsure">Unsure</option>
+              </select>
+            </td>
+            <td><textarea id="fc-check-1" rows="3" placeholder="Source or method used to verify…" aria-label="Verification method for claim 1"></textarea></td>
+            <td>
+              <select id="fc-verdict-1" aria-label="Verdict for claim 1">
+                <option value="">— Select —</option>
+                <option value="Accurate">✅ Accurate</option>
+                <option value="Partial">⚠️ Partially accurate</option>
+                <option value="Incorrect">❌ Incorrect</option>
+                <option value="Unverifiable">❓ Can't verify</option>
+              </select>
+            </td>
+            <td><textarea id="fc-notes-1" rows="3" placeholder="What was wrong, or what was distorted…" aria-label="Notes for claim 1"></textarea></td>
+          </tr>
+          <!-- Row 2 -->
+          <tr>
+            <td><span class="row-badge">2</span></td>
+            <td><textarea id="fc-claim-2" rows="3" placeholder="Paste the specific claim from the AI's response…" aria-label="Claim 2 from AI"></textarea></td>
+            <td>
+              <select id="fc-confidence-2" aria-label="Confidence level for claim 2">
+                <option value="">— Select —</option>
+                <option value="High">High</option>
+                <option value="Medium">Medium</option>
+                <option value="Low">Low</option>
+                <option value="Unsure">Unsure</option>
+              </select>
+            </td>
+            <td><textarea id="fc-check-2" rows="3" placeholder="Source or method used to verify…" aria-label="Verification method for claim 2"></textarea></td>
+            <td>
+              <select id="fc-verdict-2" aria-label="Verdict for claim 2">
+                <option value="">— Select —</option>
+                <option value="Accurate">✅ Accurate</option>
+                <option value="Partial">⚠️ Partially accurate</option>
+                <option value="Incorrect">❌ Incorrect</option>
+                <option value="Unverifiable">❓ Can't verify</option>
+              </select>
+            </td>
+            <td><textarea id="fc-notes-2" rows="3" placeholder="What was wrong, or what was distorted…" aria-label="Notes for claim 2"></textarea></td>
+          </tr>
+          <!-- Row 3 -->
+          <tr>
+            <td><span class="row-badge">3</span></td>
+            <td><textarea id="fc-claim-3" rows="3" placeholder="Paste the specific claim from the AI's response…" aria-label="Claim 3 from AI"></textarea></td>
+            <td>
+              <select id="fc-confidence-3" aria-label="Confidence level for claim 3">
+                <option value="">— Select —</option>
+                <option value="High">High</option>
+                <option value="Medium">Medium</option>
+                <option value="Low">Low</option>
+                <option value="Unsure">Unsure</option>
+              </select>
+            </td>
+            <td><textarea id="fc-check-3" rows="3" placeholder="Source or method used to verify…" aria-label="Verification method for claim 3"></textarea></td>
+            <td>
+              <select id="fc-verdict-3" aria-label="Verdict for claim 3">
+                <option value="">— Select —</option>
+                <option value="Accurate">✅ Accurate</option>
+                <option value="Partial">⚠️ Partially accurate</option>
+                <option value="Incorrect">❌ Incorrect</option>
+                <option value="Unverifiable">❓ Can't verify</option>
+              </select>
+            </td>
+            <td><textarea id="fc-notes-3" rows="3" placeholder="What was wrong, or what was distorted…" aria-label="Notes for claim 3"></textarea></td>
+          </tr>
+          <!-- Row 4 -->
+          <tr>
+            <td><span class="row-badge">4</span></td>
+            <td><textarea id="fc-claim-4" rows="3" placeholder="Paste the specific claim from the AI's response…" aria-label="Claim 4 from AI"></textarea></td>
+            <td>
+              <select id="fc-confidence-4" aria-label="Confidence level for claim 4">
+                <option value="">— Select —</option>
+                <option value="High">High</option>
+                <option value="Medium">Medium</option>
+                <option value="Low">Low</option>
+                <option value="Unsure">Unsure</option>
+              </select>
+            </td>
+            <td><textarea id="fc-check-4" rows="3" placeholder="Source or method used to verify…" aria-label="Verification method for claim 4"></textarea></td>
+            <td>
+              <select id="fc-verdict-4" aria-label="Verdict for claim 4">
+                <option value="">— Select —</option>
+                <option value="Accurate">✅ Accurate</option>
+                <option value="Partial">⚠️ Partially accurate</option>
+                <option value="Incorrect">❌ Incorrect</option>
+                <option value="Unverifiable">❓ Can't verify</option>
+              </select>
+            </td>
+            <td><textarea id="fc-notes-4" rows="3" placeholder="What was wrong, or what was distorted…" aria-label="Notes for claim 4"></textarea></td>
+          </tr>
+          <!-- Row 5 -->
+          <tr>
+            <td><span class="row-badge">5</span></td>
+            <td><textarea id="fc-claim-5" rows="3" placeholder="Paste the specific claim from the AI's response…" aria-label="Claim 5 from AI"></textarea></td>
+            <td>
+              <select id="fc-confidence-5" aria-label="Confidence level for claim 5">
+                <option value="">— Select —</option>
+                <option value="High">High</option>
+                <option value="Medium">Medium</option>
+                <option value="Low">Low</option>
+                <option value="Unsure">Unsure</option>
+              </select>
+            </td>
+            <td><textarea id="fc-check-5" rows="3" placeholder="Source or method used to verify…" aria-label="Verification method for claim 5"></textarea></td>
+            <td>
+              <select id="fc-verdict-5" aria-label="Verdict for claim 5">
+                <option value="">— Select —</option>
+                <option value="Accurate">✅ Accurate</option>
+                <option value="Partial">⚠️ Partially accurate</option>
+                <option value="Incorrect">❌ Incorrect</option>
+                <option value="Unverifiable">❓ Can't verify</option>
+              </select>
+            </td>
+            <td><textarea id="fc-notes-5" rows="3" placeholder="What was wrong, or what was distorted…" aria-label="Notes for claim 5"></textarea></td>
+          </tr>
+          <!-- Row 6 (optional) -->
+          <tr>
+            <td><span class="row-badge" style="background: var(--text-faint);">6</span></td>
+            <td><textarea id="fc-claim-6" rows="3" placeholder="Optional: add a 6th claim if you found more…" aria-label="Optional claim 6 from AI"></textarea></td>
+            <td>
+              <select id="fc-confidence-6" aria-label="Confidence level for claim 6">
+                <option value="">— Select —</option>
+                <option value="High">High</option>
+                <option value="Medium">Medium</option>
+                <option value="Low">Low</option>
+                <option value="Unsure">Unsure</option>
+              </select>
+            </td>
+            <td><textarea id="fc-check-6" rows="3" placeholder="Source or method used to verify…" aria-label="Verification method for claim 6"></textarea></td>
+            <td>
+              <select id="fc-verdict-6" aria-label="Verdict for claim 6">
+                <option value="">— Select —</option>
+                <option value="Accurate">✅ Accurate</option>
+                <option value="Partial">⚠️ Partially accurate</option>
+                <option value="Incorrect">❌ Incorrect</option>
+                <option value="Unverifiable">❓ Can't verify</option>
+              </select>
+            </td>
+            <td><textarea id="fc-notes-6" rows="3" placeholder="What was wrong, or what was distorted…" aria-label="Notes for claim 6"></textarea></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="response-area">
+      <label for="task2-summary">Overall: out of the claims you checked, how many were fully accurate? How many were wrong or partially wrong?</label>
+      <textarea id="task2-summary" rows="3" placeholder="e.g., 2 of 5 claims were fully accurate. 2 were partially accurate (real organizations, wrong details), and 1 was entirely fabricated…" aria-label="Task 2 accuracy summary"></textarea>
+    </div>
+  </section>
+
+  <hr class="section-divider" />
+
+  <!-- ── TASK 3: CONFRONT THE AI ── -->
+  <section class="content-section" data-section="task3" id="task3">
+    <div class="task-header">
+      <div class="task-num">3</div>
+      <div class="task-title-wrap">
+        <div class="task-title">Confront the AI</div>
+        <div class="task-time">~10 min</div>
+      </div>
+    </div>
+
+    <div class="box box-action">
+      <div class="box-type-label">Action</div>
+      <p>Pick one specific error or inaccuracy from your fact-check. Return to your AI conversation and tell it what it got wrong. Use the prompt template below. Screenshot how it responds.</p>
+    </div>
+
+    <div class="prompt-terminal" role="region" aria-label="Prompt template for Task 3">
+      <div class="terminal-bar">
+        <div class="dots">
+          <div class="dot red"></div>
+          <div class="dot yellow"></div>
+          <div class="dot green"></div>
+        </div>
+        <span class="terminal-label">Prompt Template — Task 3</span>
+        <button class="copy-btn" onclick="copyPrompt(this, 'prompt3')" aria-label="Copy prompt to clipboard">Copy</button>
+      </div>
+      <div class="prompt-body">
+        <code id="prompt3">In your previous response, you stated: "<span class="ph">[PASTE THE SPECIFIC CLAIM YOU FOUND TO BE WRONG]</span>"
+
+However, based on my own knowledge and research, this is not accurate. <span class="ph">[BRIEFLY EXPLAIN WHAT IS ACTUALLY TRUE]</span>.
+
+Can you explain where that information came from? And can you correct your response?</code>
+      </div>
+    </div>
+
+    <div class="response-area">
+      <label for="task3-response">How did the AI respond when you corrected it? Did it acknowledge the error, defend itself, apologize, or something else? What does that response tell you?</label>
+      <textarea id="task3-response" rows="5" placeholder="Describe the AI's response to being corrected. Was it graceful, evasive, overly apologetic? What did you notice?" aria-label="Task 3 AI confrontation response"></textarea>
+    </div>
+
+    <div class="box box-evidence">
+      <div class="box-type-label">Screenshots Required</div>
+      <p>📸 Take two screenshots before moving on:</p>
+      <ul>
+        <li><strong>Task 1 — AI Output:</strong> The full AI-generated overview from Task 1 (scroll to capture all text if needed)</li>
+        <li><strong>Task 3 — Confrontation:</strong> Your correction message and the AI's response</li>
+      </ul>
+      <p style="margin-top: 8px;">Label your files clearly. You'll attach both to your submission document.</p>
+    </div>
+  </section>
+
+  <hr class="section-divider" />
+
+  <!-- ── TASK 4: REFLECT ON THE PATTERN ── -->
+  <section class="content-section" data-section="task4" id="task4">
+    <div class="task-header">
+      <div class="task-num">4</div>
+      <div class="task-title-wrap">
+        <div class="task-title">Reflect on the Pattern</div>
+        <div class="task-time">~10 min</div>
+      </div>
+    </div>
+
+    <div class="box box-action">
+      <div class="box-type-label">Action</div>
+      <p>Before moving to the reflection questions, take a moment to review your fact-check table holistically. Look at the types of errors you found — not just whether they were wrong, but <em>how</em> they were wrong.</p>
+    </div>
+
+    <div class="response-area">
+      <label for="task4-patterns">What types of errors did you find? (e.g., wrong numbers, wrong names, outdated information, invented organizations, subtle distortions of real facts, confident-sounding claims that simply can't be verified?) Be as specific as you can.</label>
+      <textarea id="task4-patterns" rows="5" placeholder="Describe the patterns you noticed. Were errors clustered around a specific type of claim (statistics, names, dates)? Were some errors more convincing than others?" aria-label="Task 4 error pattern analysis"></textarea>
+    </div>
+  </section>
+
+  <hr class="section-divider" />
+
+  <!-- ── REFLECTION ── -->
+  <section class="content-section" data-section="reflection" id="reflection">
+    <div class="task-header">
+      <div class="task-num" style="background: var(--penn-red);">R</div>
+      <div class="task-title-wrap">
+        <div class="task-title">Reflection</div>
+        <div class="task-time">~20 min &nbsp;·&nbsp; 5 questions</div>
+      </div>
+    </div>
+
+    <div class="box box-reflect">
+      <div class="box-type-label">Important</div>
+      <p>These questions ask for your analysis and judgment — not a replay of what happened. Strong answers will go beyond describing what the AI did and explain what it means for how you should use AI tools going forward.</p>
+    </div>
+
+    <!-- Q1 -->
+    <div class="reflect-q">
+      <div class="q-num">Question 1 of 5</div>
+      <div class="q-text">What percentage of the AI's specific claims were accurate? Does that number — whatever it is — surprise you? Why or why not?</div>
+      <div class="q-hint">Think about your prior expectations of AI reliability. Where did they come from? Were they based on direct experience or assumption?</div>
+      <textarea id="reflect-1" rows="5" placeholder="Your answer…" aria-label="Reflection question 1 response"></textarea>
+    </div>
+
+    <!-- Q2 -->
+    <div class="reflect-q">
+      <div class="q-num">Question 2 of 5</div>
+      <div class="q-text">Think about someone in your field who is not AI-savvy — a colleague, a supervisor, a client. If they used AI to get information about your domain and didn't fact-check it, what would be the consequences? Be specific.</div>
+      <div class="q-hint">Think about actual decisions that might be made based on this kind of information, and what could go wrong.</div>
+      <textarea id="reflect-2" rows="5" placeholder="Your answer…" aria-label="Reflection question 2 response"></textarea>
+    </div>
+
+    <!-- Q3 -->
+    <div class="reflect-q">
+      <div class="q-num">Question 3 of 5</div>
+      <div class="q-text">What made the errors hard (or easy) to catch? Was it the specificity of the language, the plausibility of the claim, or something else?</div>
+      <div class="q-hint">This is about the form of AI errors, not just their presence. What makes a hallucination convincing?</div>
+      <textarea id="reflect-3" rows="5" placeholder="Your answer…" aria-label="Reflection question 3 response"></textarea>
+    </div>
+
+    <!-- Q4 -->
+    <div class="reflect-q">
+      <div class="q-num">Question 4 of 5</div>
+      <div class="q-text">When the AI was corrected (Task 3), how did it respond? What does that interaction reveal about how AI "knows" things — and why that's fundamentally different from how a human expert would respond to being corrected?</div>
+      <div class="q-hint">Consider what it means to learn from a correction vs. simply generate a different response.</div>
+      <textarea id="reflect-4" rows="5" placeholder="Your answer…" aria-label="Reflection question 4 response"></textarea>
+    </div>
+
+    <!-- Q5 -->
+    <div class="reflect-q">
+      <div class="q-num">Question 5 of 5</div>
+      <div class="q-text">Based on this exercise, describe two specific rules you'll personally follow when using AI for research or information-gathering in the future. Be concrete — not "I'll be careful," but actual practices.</div>
+      <div class="q-hint">Think about what checks you could realistically build into your workflow. Consider both the domain and the type of claim.</div>
+      <textarea id="reflect-5" rows="5" placeholder="Your answer…" aria-label="Reflection question 5 response"></textarea>
+    </div>
+  </section>
+
+  <hr class="section-divider" />
+
+  <!-- ── SUBMISSION ── -->
+  <section class="content-section" id="submission">
+    <div class="submit-panel">
+      <h2>Compile Your Submission</h2>
+      <p>Before clicking the button below, confirm you have completed each item. Then compile your responses into a printable document, save as PDF, and attach your two screenshots.</p>
+
+      <ul class="checklist" role="list">
+        <li>
+          <input type="checkbox" id="check1" aria-label="Screenshot Task 1 taken" />
+          <div>
+            <span>📸 Screenshot: Task 1 — AI output (full text visible)</span>
+            <span class="check-note">Your raw AI-generated content before fact-checking</span>
+          </div>
+        </li>
+        <li>
+          <input type="checkbox" id="check2" aria-label="Screenshot Task 3 taken" />
+          <div>
+            <span>📸 Screenshot: Task 3 — Confrontation conversation</span>
+            <span class="check-note">Shows how the AI responded when corrected</span>
+          </div>
+        </li>
+        <li>
+          <input type="checkbox" id="check3" aria-label="Fact-check table completed" />
+          <div>
+            <span>📋 Fact-check table completed (at least 5 rows)</span>
+            <span class="check-note">Your 5+ verified/refuted claims with verdicts</span>
+          </div>
+        </li>
+        <li>
+          <input type="checkbox" id="check4" aria-label="All five reflection questions answered" />
+          <div>
+            <span>📄 All five reflection questions answered</span>
+            <span class="check-note">Thoughtful analysis, not just summaries of what happened</span>
+          </div>
+        </li>
+      </ul>
+
+      <button class="btn-submit" onclick="prepareSubmission()" aria-label="Compile all responses for submission">
+        Compile Submission &rarr;
+      </button>
+    </div>
+  </section>
+
+</main>
+
+<!-- ── FOOTER ── -->
+<footer>
+  University of Pennsylvania &mdash; School of Liberal and Professional Studies &mdash; AI Literacy Course
+</footer>
+
+<!-- ── MODAL ── -->
+<div class="modal-overlay hidden" id="modalOverlay" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+  <div class="modal">
+    <div class="modal-header">
+      <h3 id="modalTitle">Exercise 2 Submission — The Hallucination Hunt</h3>
+      <button class="modal-close" onclick="closeModal()" aria-label="Close modal">&times;</button>
+    </div>
+    <div class="modal-body" id="modalBody">
+      <!-- Populated by JS -->
+    </div>
+    <div class="modal-footer">
+      <button class="btn-print" onclick="printSubmission()">Print / Save as PDF</button>
+      <button class="btn-cancel" onclick="closeModal()">Close</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  /* ── DOMAIN SELECTION ── */
+  let selectedDomain = '';
+
+  function selectDomain(card, name) {
+    // Deselect all
+    document.querySelectorAll('.domain-card').forEach(function(c) {
+      c.classList.remove('selected');
+      c.setAttribute('aria-pressed', 'false');
+    });
+    // Hide custom row if switching away
+    document.getElementById('customRow').style.display = 'none';
+    // Select this card
+    card.classList.add('selected');
+    card.setAttribute('aria-pressed', 'true');
+    selectedDomain = name;
+    showConfirm('Domain selected: ' + name + '. You can now proceed to Task 1.');
+    updateDots();
+  }
+
+  function showCustomInput(card) {
+    // Deselect all
+    document.querySelectorAll('.domain-card').forEach(function(c) {
+      c.classList.remove('selected');
+      c.setAttribute('aria-pressed', 'false');
+    });
+    card.classList.add('selected');
+    card.setAttribute('aria-pressed', 'true');
+    document.getElementById('customRow').style.display = 'flex';
+    document.getElementById('customDomainInput').focus();
+  }
+
+  function confirmCustom() {
+    var val = document.getElementById('customDomainInput').value.trim();
+    if (!val) {
+      alert('Please enter a description of your domain before confirming.');
+      return;
+    }
+    selectedDomain = val;
+    showConfirm('Domain selected: ' + val + '. You can now proceed to Task 1.');
+    updateDots();
+  }
+
+  function showConfirm(msg) {
+    var el = document.getElementById('selectionConfirm');
+    el.textContent = '✓ ' + msg;
+    el.style.display = 'block';
+  }
+
+  /* ── COPY PROMPT ── */
+  function copyPrompt(btn, id) {
+    var el = document.getElementById(id);
+    var text = el.innerText || el.textContent;
+    navigator.clipboard.writeText(text).then(function() {
+      btn.textContent = 'Copied!';
+      btn.classList.add('copied');
+      setTimeout(function() {
+        btn.textContent = 'Copy';
+        btn.classList.remove('copied');
+      }, 2000);
+    }).catch(function() {
+      // Fallback for older browsers
+      var ta = document.createElement('textarea');
+      ta.value = text;
+      ta.style.position = 'fixed';
+      ta.style.opacity = '0';
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand('copy');
+      document.body.removeChild(ta);
+      btn.textContent = 'Copied!';
+      btn.classList.add('copied');
+      setTimeout(function() {
+        btn.textContent = 'Copy';
+        btn.classList.remove('copied');
+      }, 2000);
+    });
+  }
+
+  /* ── PROGRESS DOTS ── */
+  var sections = ['background', 'task0', 'task1', 'task2', 'task3', 'reflection'];
+  var sectionLabels = ['Background', 'Choose Domain', 'Task 1', 'Task 2', 'Task 3', 'Reflection'];
+  var activeDotIndex = 0;
+
+  function buildDots() {
+    var track = document.getElementById('progressTrack');
+    track.innerHTML = '';
+    sections.forEach(function(sec, i) {
+      var btn = document.createElement('button');
+      btn.className = 'pdot' + (i === 0 ? ' active' : '');
+      btn.title = sectionLabels[i];
+      btn.setAttribute('aria-label', 'Go to ' + sectionLabels[i]);
+      btn.addEventListener('click', function() {
+        var el = document.getElementById(sec);
+        if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        setActiveDot(i);
+      });
+      track.appendChild(btn);
+    });
+  }
+
+  function setActiveDot(index) {
+    activeDotIndex = index;
+    updateDots();
+  }
+
+  function updateDots() {
+    var dots = document.querySelectorAll('.pdot');
+    var completedSections = getCompletedSections();
+    dots.forEach(function(dot, i) {
+      dot.classList.remove('active', 'done');
+      if (completedSections[i]) {
+        dot.classList.add('done');
+      } else if (i === activeDotIndex) {
+        dot.classList.add('active');
+      }
+    });
+  }
+
+  function getCompletedSections() {
+    var results = [false, false, false, false, false, false];
+    // Background: always readable
+    results[0] = true;
+    // Task 0: domain selected
+    results[1] = !!selectedDomain;
+    // Task 1: response entered
+    results[2] = (document.getElementById('task1-response').value.trim().length > 20);
+    // Task 2: at least 5 claims with verdicts
+    var verdictsFilled = 0;
+    for (var i = 1; i <= 5; i++) {
+      if (document.getElementById('fc-verdict-' + i).value) verdictsFilled++;
+    }
+    results[3] = (verdictsFilled >= 5 && document.getElementById('task2-summary').value.trim().length > 5);
+    // Task 3: confrontation response
+    results[4] = (document.getElementById('task3-response').value.trim().length > 20);
+    // Reflection: all 5 answered
+    var reflectFilled = 0;
+    for (var j = 1; j <= 5; j++) {
+      if (document.getElementById('reflect-' + j).value.trim().length > 20) reflectFilled++;
+    }
+    results[5] = (reflectFilled === 5);
+    return results;
+  }
+
+  /* ── SCROLL SPY ── */
+  function initScrollSpy() {
+    var observer = new IntersectionObserver(function(entries) {
+      entries.forEach(function(entry) {
+        if (entry.isIntersecting) {
+          var id = entry.target.id;
+          var idx = sections.indexOf(id);
+          if (idx !== -1) setActiveDot(idx);
+        }
+      });
+    }, { threshold: 0.3 });
+
+    sections.forEach(function(sec) {
+      var el = document.getElementById(sec);
+      if (el) observer.observe(el);
+    });
+  }
+
+  /* ── ESCAPE HTML ── */
+  function escHtml(s) {
+    if (!s) return '<em style="color: var(--text-faint);">No response entered.</em>';
+    return s
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/\n/g, '<br>');
+  }
+
+  /* ── PREPARE SUBMISSION ── */
+  function prepareSubmission() {
+    var body = document.getElementById('modalBody');
+    var html = '';
+
+    html += '<p>Review your compiled responses below. Click <strong>Print / Save as PDF</strong> to generate your submission document. Remember to attach your two screenshots.</p>';
+
+    // Domain
+    html += '<div class="modal-answer"><div class="label">Domain Selected</div><div class="value">' + escHtml(selectedDomain || 'Not selected') + '</div></div>';
+
+    // Task 1
+    html += '<div class="modal-answer"><div class="label">Task 1 — AI Response (pasted)</div><div class="value">' + escHtml(document.getElementById('task1-response').value) + '</div></div>';
+
+    // Task 2 — Fact-check table
+    html += '<div class="modal-answer"><div class="label">Task 2 — Fact-Check Table</div>';
+    for (var i = 1; i <= 6; i++) {
+      var claim = document.getElementById('fc-claim-' + i).value.trim();
+      if (!claim) continue;
+      var confidence = document.getElementById('fc-confidence-' + i).value;
+      var check = document.getElementById('fc-check-' + i).value.trim();
+      var verdict = document.getElementById('fc-verdict-' + i).value;
+      var notes = document.getElementById('fc-notes-' + i).value.trim();
+      html += '<div style="background: var(--bg); border-radius: 6px; padding: 10px 12px; margin-bottom: 10px; border-left: 3px solid var(--penn-blue);">';
+      html += '<div style="font-size:.75rem; font-weight:700; color: var(--penn-blue); margin-bottom:4px;">Claim ' + i + '</div>';
+      html += '<div style="font-size:.85rem; color: var(--text); margin-bottom:6px;">' + escHtml(claim) + '</div>';
+      html += '<div style="font-size:.78rem; color: var(--text-muted);">Confidence: <strong>' + (confidence || '—') + '</strong> &nbsp;|&nbsp; Verdict: <strong>' + (verdict || '—') + '</strong></div>';
+      if (check) html += '<div style="font-size:.78rem; color: var(--text-muted); margin-top:4px;">Checked via: ' + escHtml(check) + '</div>';
+      if (notes) html += '<div style="font-size:.78rem; color: var(--text-muted); margin-top:4px;">Notes: ' + escHtml(notes) + '</div>';
+      html += '</div>';
+    }
+    html += '<div style="margin-top:6px;"><span style="font-size:.75rem; font-weight:700; color:var(--penn-blue);">Overall accuracy summary:</span><br><span style="font-size:.85rem;">' + escHtml(document.getElementById('task2-summary').value) + '</span></div>';
+    html += '</div>';
+
+    // Task 3
+    html += '<div class="modal-answer"><div class="label">Task 3 — Confrontation Response</div><div class="value">' + escHtml(document.getElementById('task3-response').value) + '</div></div>';
+
+    // Task 4
+    html += '<div class="modal-answer"><div class="label">Task 4 — Error Patterns</div><div class="value">' + escHtml(document.getElementById('task4-patterns').value) + '</div></div>';
+
+    // Reflections
+    var reflectTitles = [
+      'Q1 — Accuracy percentage & surprise',
+      'Q2 — Consequences for a non-AI-savvy colleague',
+      'Q3 — What made errors hard or easy to catch',
+      'Q4 — What the correction interaction reveals',
+      'Q5 — Two personal rules for AI use going forward'
+    ];
+    for (var j = 1; j <= 5; j++) {
+      html += '<div class="modal-answer"><div class="label">' + reflectTitles[j - 1] + '</div><div class="value">' + escHtml(document.getElementById('reflect-' + j).value) + '</div></div>';
+    }
+
+    html += '<div style="font-size:.78rem; color: var(--text-faint); border-top: 1px solid var(--border); padding-top: 12px; margin-top: 8px;">Penn LPS AI Literacy Course &mdash; Exercise 2: The Hallucination Hunt</div>';
+
+    body.innerHTML = html;
+    document.getElementById('modalOverlay').classList.remove('hidden');
+    document.body.style.overflow = 'hidden';
+  }
+
+  /* ── MODAL ── */
+  function closeModal() {
+    document.getElementById('modalOverlay').classList.add('hidden');
+    document.body.style.overflow = '';
+  }
+
+  function printSubmission() {
+    window.print();
+  }
+
+  // Close modal on overlay click
+  document.getElementById('modalOverlay').addEventListener('click', function(e) {
+    if (e.target === this) closeModal();
+  });
+
+  // Close modal on Escape key
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') closeModal();
+  });
+
+  /* ── KEYBOARD SUPPORT FOR DOMAIN CARDS ── */
+  document.querySelectorAll('.domain-card').forEach(function(card) {
+    card.addEventListener('keydown', function(e) {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        card.click();
+      }
+    });
+  });
+
+  /* ── LIVE DOT UPDATES ── */
+  document.querySelectorAll('textarea, select').forEach(function(el) {
+    el.addEventListener('input', updateDots);
+    el.addEventListener('change', updateDots);
+  });
+
+  /* ── INIT ── */
+  buildDots();
+  initScrollSpy();
+</script>
+</body>
+</html>
