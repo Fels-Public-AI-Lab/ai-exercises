@@ -6,10 +6,10 @@ Interactive, browser-based exercises for the **Fels Institute of Government Publ
 
 | # | Exercise | Folder |
 |---|----------|--------|
-| 1 | **The Prompt Lab** — Experiment with how prompt wording, context, and structure shape AI output | `prompt-engineering-lab/` |
-| 2 | **The Hallucination Hunt** — Identify and analyze AI-generated content that is plausible but factually wrong | `hallucination-hunt/` |
-| 3 | **The Framing Audit** — Examine how framing and perspective influence AI responses | `framing-audit/` |
-| 4 | **AI as Research Partner** — Practice using AI effectively as a research and analysis tool | `ai-research-partner/` |
+| 1 | [**The Prompt Lab**](./prompt-engineering-lab/) — Experiment with how prompt wording, context, and structure shape AI output | `prompt-engineering-lab/` |
+| 2 | [**The Hallucination Hunt**](./hallucination-hunt/) — Identify and analyze AI-generated content that is plausible but factually wrong | `hallucination-hunt/` |
+| 3 | [**The Framing Audit**](./framing-audit/) — Examine how framing and perspective influence AI responses | `framing-audit/` |
+| 4 | [**AI as Research Partner**](./ai-research-partner/) — Practice using AI effectively as a research and analysis tool | `ai-research-partner/` |
 
 ## Usage
 
